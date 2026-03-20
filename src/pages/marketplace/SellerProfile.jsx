@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useContext, useEffect, useRef, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
-import { useMarketplace } from "../../context/MarketPlaceContext";
+import { collection, query, where, limit, startAfter, getDocs } from "firebase/firestore";
+import { db, auth } from "../../firebase/config";
 import ProductImageCarousel from "../dashboard/ProductImageCarousel";
-import { auth } from "../../firebase/config";
 import {
     FaSearch, FaWhatsapp, FaPhoneAlt, FaMoon, FaSun,
     FaStore, FaMapMarkerAlt, FaTag, FaFire,
@@ -13,23 +13,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import LOgo from "../../images/me2sell-logo.png";
 
 /* ─────────────────────────────────────────────────────────────────
-   CART — shared localStorage key with BuyerMarketplace so items
-   added here appear in the main marketplace cart and vice versa
+   CART
 ───────────────────────────────────────────────────────────────── */
 const CART_KEY = "marketplace_cart_v1";
 const loadCart = () => { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } };
-const saveCart = (items) => { try { localStorage.setItem(CART_KEY, JSON.stringify(items)); } catch { } };
+const saveCart = (items) => { try { localStorage.setItem(CART_KEY, JSON.stringify(items)); } catch {} };
 
 /* ─────────────────────────────────────────────────────────────────
    CART DRAWER
 ───────────────────────────────────────────────────────────────── */
 function CartDrawer({ cart, onUpdate, onClose, onSelect }) {
     const remove = (e, id) => { e.stopPropagation(); onUpdate(cart.filter(i => i.id !== id)); };
-
-    const handleItemClick = (item) => {
-        onClose();
-        onSelect(item);
-    };
 
     return (
         <motion.div
@@ -58,24 +52,15 @@ function CartDrawer({ cart, onUpdate, onClose, onSelect }) {
                     </div>
                 ) : cart.map(item => (
                     <motion.div key={item.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                        onClick={() => handleItemClick(item)}
+                        onClick={() => { onClose(); onSelect(item); }}
                         className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl cursor-pointer hover:bg-green-50 dark:hover:bg-gray-700 transition group">
-                        {item.image ?
-                            <img src={item.image} alt={item.name}
-                                className="w-16 h-16 object-cover rounded-lg shrink-0 group-hover:scale-105 transition-transform duration-200"
-                            />
-                            :
-                            <div className="flex justify-center pt-2">
-                                <FaBox className="text-4xl text-gray-300" />
-                            </div>
+                        {item.image
+                            ? <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg shrink-0 group-hover:scale-105 transition-transform duration-200" />
+                            : <div className="flex justify-center pt-2"><FaBox className="text-4xl text-gray-300" /></div>
                         }
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-800 dark:text-white line-clamp-1 group-hover:text-green-600 transition-colors">
-                                {item.name}
-                            </p>
-                            <p className="text-green-600 font-bold text-sm mt-1">
-                                {item.currencySymbol}{item.sellingPrice?.toLocaleString()}
-                            </p>
+                            <p className="text-sm font-semibold text-gray-800 dark:text-white line-clamp-1 group-hover:text-green-600 transition-colors">{item.name}</p>
+                            <p className="text-green-600 font-bold text-sm mt-1">{item.currencySymbol}{item.sellingPrice?.toLocaleString()}</p>
                         </div>
                         <button onClick={(e) => remove(e, item.id)}
                             className="self-start p-1.5 text-gray-300 hover:text-red-500 transition rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
@@ -98,7 +83,7 @@ function CartDrawer({ cart, onUpdate, onClose, onSelect }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   PRODUCT CARD — identical to BuyerMarketplace
+   PRODUCT CARD
 ───────────────────────────────────────────────────────────────── */
 function ProductCard({ product, imageIndex, onSelect, onAddToCart, inCart }) {
     const images = [product.image, product.image2].filter(Boolean);
@@ -109,20 +94,17 @@ function ProductCard({ product, imageIndex, onSelect, onAddToCart, inCart }) {
             className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 cursor-pointer group"
         >
             <div className="relative overflow-hidden" onClick={() => onSelect(product)}>
-                {product.image ?
-                    <motion.img
+                {product.image
+                    ? <motion.img
                         key={imageIndex}
                         src={images[imageIndex] || images[0]}
                         alt={product.name}
                         className="w-full h-40 md:h-44 object-cover group-hover:scale-105 transition-transform duration-500"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.6 }}
-                    />
-                    :
-                    <div className="flex w-full h-40 md:h-44 object-cover justify-center pt-2">
-                        <FaBox className="h-40 text-[120px] md:text-[150px] text-gray-200" />
-                    </div>
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}
+                      />
+                    : <div className="flex w-full h-40 md:h-44 justify-center items-center bg-gray-100 dark:bg-gray-700">
+                        <FaBox className="text-[80px] text-gray-300" />
+                      </div>
                 }
                 {product.sold > 0 && (
                     <div className="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -131,36 +113,28 @@ function ProductCard({ product, imageIndex, onSelect, onAddToCart, inCart }) {
                 )}
                 {product.location?.city && (
                     <div className="absolute bottom-2 left-2 bg-white/90 dark:bg-gray-900/90 text-gray-700 dark:text-gray-300 text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <FaMapMarkerAlt size={8} className="text-green-600" />
-                        {product.location.city}
+                        <FaMapMarkerAlt size={8} className="text-green-600" /> {product.location.city}
                     </div>
                 )}
             </div>
 
             <div className="p-3" onClick={() => onSelect(product)}>
-                <h4 className="font-semibold text-xs md:text-sm text-gray-800 dark:text-gray-100 line-clamp-1">
-                    {product.name}
-                </h4>
+                <h4 className="font-semibold text-xs md:text-sm text-gray-800 dark:text-gray-100 line-clamp-1">{product.name}</h4>
                 {product.businessName && (
                     <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
                         <FaStore size={8} /> {product.businessName}
                     </p>
                 )}
-                <div className="flex items-center justify-between mt-2">
-                    <p className="text-green-600 font-bold md:text-base text-sm">
-                        {product.currencySymbol}{product.sellingPrice?.toLocaleString()}
-                    </p>
-                </div>
+                <p className="text-green-600 font-bold md:text-base text-sm mt-2">
+                    {product.currencySymbol}{product.sellingPrice?.toLocaleString()}
+                </p>
             </div>
 
             <div className="px-3 pb-3">
                 <button
                     onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
                     className={`w-full py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2
-                        ${inCart
-                            ? "bg-green-600 text-white"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-600 hover:text-white"
-                        }`}
+                        ${inCart ? "bg-green-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-600 hover:text-white"}`}
                 >
                     <FaShoppingCart size={10} />
                     {inCart ? "Added ✓" : "Add to Cart"}
@@ -171,15 +145,13 @@ function ProductCard({ product, imageIndex, onSelect, onAddToCart, inCart }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   PRODUCT MODAL — identical layout to BuyerMarketplace.
-   Uses local imgIndex state + <motion.img> to guarantee images
-   always render (avoids dynamic Tailwind class purge issues).
+   PRODUCT MODAL
 ───────────────────────────────────────────────────────────────── */
 function ProductModal({ product, storeProducts, cart, onAddToCart, onClose, onSelect }) {
     const inCart = cart.some(i => i.id === product.id);
     const modalScrollRef = useRef(null);
-    const images = [product.image, product.image2].filter(Boolean);
     const [imgIndex, setImgIndex] = useState(0);
+    const images = [product.image, product.image2].filter(Boolean);
 
     useEffect(() => {
         setImgIndex(0);
@@ -213,20 +185,31 @@ function ProductModal({ product, storeProducts, cart, onAddToCart, onClose, onSe
                     {/* Left — image */}
                     <div className="p-4">
                         <div className="relative rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                            {product.image ?
-                                <ProductImageCarousel
-                                    images={[product.image, product.image2].filter(Boolean)}
-                                    imgHeight="60"
-                                />
-                                :
-                                <div className="flex w-full h-40 md:h-44 object-cover justify-center pt-2">
-                                    <FaBox className="h-40 text-[120px] md:text-[150px] text-gray-200" />
-                                </div>
+                            {product.image
+                                ? <>
+                                    <motion.img
+                                        key={imgIndex}
+                                        src={images[imgIndex] || images[0]}
+                                        alt={product.name}
+                                        className="w-full h-64 md:h-80 object-cover"
+                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
+                                    />
+                                    {images.length > 1 && (
+                                        <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                                            {images.map((_, i) => (
+                                                <button key={i} onClick={() => setImgIndex(i)}
+                                                    className={`w-2 h-2 rounded-full transition ${i === imgIndex ? "bg-white" : "bg-white/50"}`} />
+                                            ))}
+                                        </div>
+                                    )}
+                                  </>
+                                : <div className="flex w-full h-64 md:h-80 justify-center items-center">
+                                    <FaBox className="text-[120px] text-gray-300" />
+                                  </div>
                             }
-
                         </div>
 
-                        {/* More from store — desktop left column */}
+                        {/* More from store — desktop */}
                         {storeProducts.length > 0 && (
                             <div className="mt-4 hidden md:block">
                                 <h4 className="font-bold text-sm text-gray-700 dark:text-gray-300 mb-3">More from this store</h4>
@@ -234,12 +217,9 @@ function ProductModal({ product, storeProducts, cart, onAddToCart, onClose, onSe
                                     {storeProducts.slice(0, 6).map(item => (
                                         <div key={item.id} onClick={() => onSelect(item)}
                                             className="min-w-[110px] cursor-pointer bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden hover:shadow-md transition shrink-0">
-                                            {item.image ?
-                                                <img src={item.image} alt={item.name} className="w-full h-20 object-cover" />
-                                                :
-                                                <div className="flex justify-center pt-2">
-                                                    <FaBox className="text-5xl text-gray-300" />
-                                                </div>
+                                            {item.image
+                                                ? <img src={item.image} alt={item.name} className="w-full h-20 object-cover" />
+                                                : <div className="flex justify-center items-center h-20 bg-gray-100 dark:bg-gray-700"><FaBox className="text-4xl text-gray-300" /></div>
                                             }
                                             <div className="p-2">
                                                 <p className="text-xs font-medium line-clamp-1 dark:text-gray-300">{item.name}</p>
@@ -328,12 +308,9 @@ function ProductModal({ product, storeProducts, cart, onAddToCart, onClose, onSe
                                     {storeProducts.slice(0, 6).map(item => (
                                         <div key={item.id} onClick={() => onSelect(item)}
                                             className="min-w-[110px] cursor-pointer bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden hover:shadow-md transition shrink-0">
-                                            {item.image ?
-                                                <img src={item.image} alt={item.name} className="w-full h-20 object-cover" />
-                                                :
-                                                <div className="flex justify-center pt-2">
-                                                    <FaBox className="text-5xl text-gray-300" />
-                                                </div>
+                                            {item.image
+                                                ? <img src={item.image} alt={item.name} className="w-full h-20 object-cover" />
+                                                : <div className="flex justify-center items-center h-20 bg-gray-100 dark:bg-gray-700"><FaBox className="text-4xl text-gray-300" /></div>
                                             }
                                             <div className="p-2">
                                                 <p className="text-xs font-medium line-clamp-1 dark:text-gray-300">{item.name}</p>
@@ -356,22 +333,26 @@ function ProductModal({ product, storeProducts, cart, onAddToCart, onClose, onSe
 ───────────────────────────────────────────────────────────────── */
 export default function SellerProfile() {
     const { sellerId } = useParams();
+    const { theme, toggleTheme } = useContext(ThemeContext);
 
-    // ✅ Pull directly from MarketplaceContext — zero extra Firestore reads.
-    // The context already has all marketplace products in memory with every
-    // seller field embedded (businessName, phone, address, whatsappLink, etc.)
-    // written by the cloud function at publish time.
-    const { products: allProducts, loading: marketplaceLoading } = useMarketplace();
+    const PAGE_SIZE = 20;
+    const LS_KEY    = `seller_products_${sellerId}`;
 
-    const [searchQuery, setSearchQuery] = useState("");
+    // ── State ────────────────────────────────────────────────────
+    const [sellerProducts,  setSellerProducts]  = useState([]);
+    const [seller,          setSeller]          = useState(null);
+    const [loading,         setLoading]         = useState(true);
+    const [loadingMore,     setLoadingMore]     = useState(false);
+    const [hasMore,         setHasMore]         = useState(false);
+    const [lastDoc,         setLastDoc]         = useState(null);
+    const [searchQuery,     setSearchQuery]     = useState("");
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [cart, setCartState] = useState(loadCart);
-    const [showCart, setShowCart] = useState(false);
-    const [user, setUser] = useState(null);
-    const [imageIndexes, setImageIndexes] = useState({});
+    const [cart,            setCartState]       = useState(loadCart);
+    const [showCart,        setShowCart]        = useState(false);
+    const [user,            setUser]            = useState(null);
+    const [imageIndexes,    setImageIndexes]    = useState({});
     const imageTimersRef = useRef({});
 
-    const { theme, toggleTheme } = useContext(ThemeContext);
     const cartCount = cart.length;
 
     useEffect(() => {
@@ -393,20 +374,79 @@ export default function SellerProfile() {
         });
     };
 
-    // ── Filter this seller's products from the context ───────────
-    // sellerId on every marketplaceProduct doc = uid from cloud function path
-    // products/{uid}/productList/{productId}  →  sellerId: uid
-    const sellerProducts = useMemo(
-        () => allProducts.filter(p => p.sellerId === sellerId),
-        [allProducts, sellerId]
-    );
+    // ── Fetch first page ─────────────────────────────────────────
+    const fetchProducts = useCallback(async () => {
+        setLoading(true);
 
-    // ── Seller info — read from first matching product ───────────
-    // Cloud function writes: businessName, businessType, phone,
-    // address, country, currencySymbol, whatsappLink onto every doc
-    const seller = sellerProducts[0] ?? null;
+        // Clear any stale/empty cache before fetching
+        localStorage.removeItem(LS_KEY);
 
-    // ── Search filter ────────────────────────────────────────────
+        try {
+            const snap = await getDocs(
+                query(
+                    collection(db, "marketplaceProducts"),
+                    where("sellerId", "==", sellerId),
+                    limit(PAGE_SIZE)
+                )
+            );
+
+            const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const more = snap.docs.length === PAGE_SIZE;
+            const last = snap.docs[snap.docs.length - 1] ?? null;
+
+            setSellerProducts(list);
+            setSeller(list[0] ?? null);
+            setHasMore(more);
+            setLastDoc(last);
+
+            if (list.length > 0) {
+                localStorage.setItem(LS_KEY, JSON.stringify({
+                    products: list,
+                    hasMore: more,
+                    timestamp: Date.now(),
+                }));
+            }
+        } catch (err) {
+            console.error("fetchProducts error:", err);
+        } finally {
+            setLoading(false);
+        }
+    }, [sellerId]);
+
+    // ── Fetch next page ──────────────────────────────────────────
+    const fetchMore = useCallback(async () => {
+        if (loadingMore || !hasMore || !lastDoc) return;
+        setLoadingMore(true);
+        try {
+            const snap = await getDocs(
+                query(
+                    collection(db, "marketplaceProducts"),
+                    where("sellerId", "==", sellerId),
+                    limit(PAGE_SIZE),
+                    startAfter(lastDoc)
+                )
+            );
+
+            const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            setSellerProducts(prev => {
+                const merged = [...prev, ...list].filter(
+                    (p, i, arr) => arr.findIndex(x => x.id === p.id) === i
+                );
+                return merged;
+            });
+            setHasMore(snap.docs.length === PAGE_SIZE);
+            setLastDoc(snap.docs[snap.docs.length - 1] ?? null);
+        } catch (err) {
+            console.error("fetchMore error:", err);
+        } finally {
+            setLoadingMore(false);
+        }
+    }, [sellerId, lastDoc, hasMore, loadingMore]);
+
+    useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+    // ── Search filter (client-side on loaded products) ───────────
     const filteredProducts = useMemo(() => {
         if (!searchQuery.trim()) return sellerProducts;
         const q = searchQuery.toLowerCase();
@@ -417,7 +457,13 @@ export default function SellerProfile() {
         );
     }, [sellerProducts, searchQuery]);
 
-    // ── Image slideshow — same logic as BuyerMarketplace ─────────
+    // ── Modal "more from store" strip ────────────────────────────
+    const storeProducts = useMemo(
+        () => selectedProduct ? sellerProducts.filter(p => p.id !== selectedProduct.id) : [],
+        [sellerProducts, selectedProduct]
+    );
+
+    // ── Image slideshow ──────────────────────────────────────────
     useEffect(() => {
         filteredProducts.forEach((product) => {
             const images = [product.image, product.image2].filter(Boolean);
@@ -440,14 +486,8 @@ export default function SellerProfile() {
         };
     }, [filteredProducts]);
 
-    // ── Products shown in modal's "More from store" strip ────────
-    const storeProducts = useMemo(
-        () => selectedProduct ? sellerProducts.filter(p => p.id !== selectedProduct.id) : [],
-        [sellerProducts, selectedProduct]
-    );
-
-    // ── Loading — wait for marketplace context to hydrate ────────
-    if (marketplaceLoading && allProducts.length === 0) {
+    // ── Loading screen ───────────────────────────────────────────
+    if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <motion.div
@@ -459,14 +499,14 @@ export default function SellerProfile() {
         );
     }
 
-    // ── Seller not found ─────────────────────────────────────────
-    if (!marketplaceLoading && sellerProducts.length === 0) {
+    // ── Store not found ──────────────────────────────────────────
+    if (!loading && sellerProducts.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center gap-3 text-gray-400">
                 <FaStore size={40} />
                 <p className="font-semibold">Store not found</p>
                 <p className="text-sm text-center max-w-xs">
-                    This seller has no published products, or their products haven't loaded yet.
+                    This seller has no published products, or the store may have moved.
                 </p>
                 <Link to="/marketplace" className="mt-2 text-sm text-green-600 hover:underline">
                     ← Back to Marketplace
@@ -488,7 +528,7 @@ export default function SellerProfile() {
                     </Link>
 
                     <Link to="/" className="shrink-0">
-                        <img src={LOgo} alt="Me2Sell" className="h-7 w-auto" />
+                        <img src={LOgo} alt="Me2Sell" className="hidden md:block h-7 w-auto" />
                     </Link>
 
                     {/* Search */}
@@ -523,8 +563,7 @@ export default function SellerProfile() {
                     <button onClick={toggleTheme} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition shrink-0">
                         {theme === "light"
                             ? <FaMoon size={13} className="text-gray-500" />
-                            : <FaSun size={13} className="text-yellow-400" />
-                        }
+                            : <FaSun size={13} className="text-yellow-400" />}
                     </button>
                 </div>
             </header>
@@ -536,8 +575,10 @@ export default function SellerProfile() {
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 mb-6">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-2xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                                    <FaStore className="text-green-600" size={24} />
+                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center shrink-0">
+                                    <span className="text-white font-black text-2xl">
+                                        {(seller.businessName || "?").charAt(0).toUpperCase()}
+                                    </span>
                                 </div>
                                 <div>
                                     <h1 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -553,6 +594,10 @@ export default function SellerProfile() {
                                                 {[seller.address, seller.country].filter(Boolean).join(", ")}
                                             </span>
                                         )}
+                                        <span className="flex items-center gap-1">
+                                            <FaTag size={9} className="text-green-600" />
+                                            {sellerProducts.length} product{sellerProducts.length !== 1 ? "s" : ""}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -575,13 +620,17 @@ export default function SellerProfile() {
                     </div>
                 )}
 
-                {/* ── PRODUCTS ── */}
+                {/* ── PRODUCTS HEADER ── */}
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-base font-bold text-gray-900 dark:text-white">
                         Products
+                        <span className="ml-2 text-sm font-normal text-gray-400">
+                            ({filteredProducts.length}{searchQuery ? " matching" : ""})
+                        </span>
                     </h2>
                 </div>
 
+                {/* ── PRODUCT GRID ── */}
                 {filteredProducts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-2 text-gray-400">
                         <FaSearch size={28} />
@@ -606,6 +655,28 @@ export default function SellerProfile() {
                         </AnimatePresence>
                     </div>
                 )}
+
+                {/* ── LOAD MORE ── */}
+                {hasMore && !searchQuery && (
+                    <div className="flex justify-center mt-8">
+                        <button
+                            onClick={fetchMore}
+                            disabled={loadingMore}
+                            className="px-8 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-green-600 hover:text-white hover:border-green-600 font-semibold text-sm transition shadow-sm disabled:opacity-50"
+                        >
+                            {loadingMore ? (
+                                <span className="flex items-center gap-2">
+                                    <motion.span
+                                        animate={{ rotate: 360 }}
+                                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                                        className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                                    />
+                                    Loading...
+                                </span>
+                            ) : "Load More"}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* ── CART DRAWER ── */}
@@ -614,7 +685,12 @@ export default function SellerProfile() {
                     <>
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="fixed inset-0 z-40 bg-black/50" onClick={() => setShowCart(false)} />
-                        <CartDrawer cart={cart} onUpdate={updateCart} onClose={() => setShowCart(false)} onSelect={(p) => { setShowCart(false); setSelectedProduct(p); }} />
+                        <CartDrawer
+                            cart={cart}
+                            onUpdate={updateCart}
+                            onClose={() => setShowCart(false)}
+                            onSelect={(p) => { setShowCart(false); setSelectedProduct(p); }}
+                        />
                     </>
                 )}
             </AnimatePresence>

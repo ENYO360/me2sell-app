@@ -340,7 +340,7 @@ function ProductModal({ product, similarProducts, sellerProducts, cart, onAddToC
                             </p>
                         )}
 
-                        <div className="grid grid-cols-2 gap-2 text-sm">  
+                        <div className="grid grid-cols-2 gap-2 text-sm">
                             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
                                 <p className="text-gray-400 text-xs">In Stock</p>
                                 <p className="font-semibold text-gray-800 dark:text-white mt-0.5">{product.quantity}</p>
@@ -488,6 +488,7 @@ export default function BuyerMarketplace({ categories = [] }) {
         clearSearch,
         isSearching,
         MARKETPLACE_CATEGORIES,
+        sellerResults,
     } = useMarketplace();
 
     // ── Auth ──────────────────────────────────────────────────────
@@ -798,6 +799,40 @@ export default function BuyerMarketplace({ categories = [] }) {
                         </div>
                     )}
                 </div>
+
+                {/* ── SELLER SEARCH RESULTS ── */}
+                {isSearching && sellerResults.length > 0 && (
+                    <div className="mb-5">
+                        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+                            Stores matching "{searchQuery}"
+                        </p>
+                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                            {sellerResults.map(seller => (
+                                <Link
+                                    key={seller.sellerId}
+                                    to={`/seller/${seller.sellerId}`}
+                                    className="shrink-0 flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-green-500 hover:shadow-md transition-all min-w-[200px]"
+                                >
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center shrink-0">
+                                        <span className="text-white font-black">
+                                            {seller.businessName.charAt(0).toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1">
+                                            {seller.businessName}
+                                        </p>
+                                        <p className="text-xs text-gray-400">
+                                            {seller.productCount} product{seller.productCount !== 1 ? "s" : ""}
+                                            {seller.country ? ` · ${seller.country}` : ""}
+                                        </p>
+                                    </div>
+                                    <FaChevronRight size={10} className="text-gray-300 ml-auto shrink-0" />
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {locationError && (
                     <p className="text-xs text-red-500 mb-3 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-xl">{locationError}</p>

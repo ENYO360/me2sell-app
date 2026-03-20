@@ -23,8 +23,10 @@ const MarketplaceContext = createContext();
 
 const PAGE_SIZE = 20;
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const SELLERS_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
 const ALL_CACHE_KEY = "marketplace_all_products_v2";
+const SELLERS_CACHE_KEY = "marketplace_sellers_v1";
 const categoryCacheKey = (id) =>
     `marketplace_category_${id}_v2`;
 
@@ -50,6 +52,9 @@ export function MarketplaceProvider({ children }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearching, setIsSearching] = useState(false);
     const lastSearchDocRef = useRef(null);
+    const [sellers, setSellers] = useState([]);
+    const [sellerResults, setSellerResults] = useState([]);
+    const [loadingSellers, setLoadingSellers] = useState(false);
 
     useEffect(() => {
         // Only trigger when user clears text manually
@@ -176,6 +181,8 @@ export function MarketplaceProvider({ children }) {
         if (!queryText?.trim()) return;
         if (fetchingRef.current || (!hasMore && !reset)) return;
 
+        searchSellers(queryText);
+
         fetchingRef.current = true;
         setLoading(true);
 
@@ -225,6 +232,7 @@ export function MarketplaceProvider({ children }) {
     const clearSearch = async () => {
         setSearchQuery("");
         setIsSearching(false);
+        setSellerResults([]);
         lastSearchDocRef.current = null;
 
         lastDocRef.current = null;
@@ -246,6 +254,79 @@ export function MarketplaceProvider({ children }) {
         }
     };
 
+    /* ---------------- FETCH SELLERS ---------------- */
+    const fetchSellers = async () => {
+        // Check cache first
+        try {
+            const raw = localStorage.getItem(SELLERS_CACHE_KEY);
+            if (raw) {
+                const cached = JSON.parse(raw);
+                if (!isCacheStale(cached.savedAt, SELLERS_CACHE_TTL)) {
+                    setSellers(cached.sellers);
+                    return;
+                }
+            }
+        } catch { }
+
+        setLoadingSellers(true);
+        try {
+            const snap = await getDocs(
+                query(collection(db, "marketplaceProducts"), limit(200))
+            );
+
+            // Dedupe by sellerId, keep richest data
+            const map = new Map();
+            snap.docs.forEach((d) => {
+                const p = d.data();
+                if (!p.sellerId) return;
+                if (map.has(p.sellerId)) {
+                    map.get(p.sellerId).productCount += 1;
+                } else {
+                    map.set(p.sellerId, {
+                        sellerId: p.sellerId,
+                        businessName: p.businessName || "Unknown Store",
+                        businessType: p.businessType || "",
+                        address: p.address || "",
+                        country: p.country || "",
+                        phone: p.phone || "",
+                        whatsappLink: p.whatsappLink || "",
+                        productCount: 1,
+                    });
+                }
+            });
+
+            const list = Array.from(map.values())
+                .sort((a, b) => b.productCount - a.productCount);
+
+            setSellers(list);
+            localStorage.setItem(SELLERS_CACHE_KEY, JSON.stringify({
+                sellers: list,
+                savedAt: Date.now(),
+            }));
+        } catch (err) {
+            console.error("fetchSellers failed:", err);
+        } finally {
+            setLoadingSellers(false);
+        }
+    };
+
+    /* ---------------- SEARCH SELLERS ---------------- */
+    const searchSellers = (queryText) => {
+        if (!queryText?.trim()) {
+            setSellerResults([]);
+            return;
+        }
+        const q = queryText.toLowerCase();
+        setSellerResults(
+            sellers.filter(s =>
+                s.businessName?.toLowerCase().includes(q) ||
+                s.businessType?.toLowerCase().includes(q) ||
+                s.address?.toLowerCase().includes(q) ||
+                s.country?.toLowerCase().includes(q)
+            )
+        );
+    };
+
     /* ---------------- INIT ---------------- */
     useEffect(() => {
         const cached = loadCache(ALL_CACHE_KEY);
@@ -263,7 +344,8 @@ export function MarketplaceProvider({ children }) {
             setHasMore(true);
             fetchProducts({ reset: true });
         }
-        // eslint-disable-next-line
+
+        fetchSellers();
     }, []);
 
     /* ---------------- CATEGORY SWITCH ---------------- */
@@ -359,7 +441,14 @@ export function MarketplaceProvider({ children }) {
                 setSearchQuery,
                 searchProducts,
                 hasMoreSearch,
-                clearSearch
+                clearSearch,
+
+                // Sellers
+                sellers,
+                sellerResults,
+                loadingSellers,
+                fetchSellers,
+                searchSellers,
             }}
         >
             {children}
