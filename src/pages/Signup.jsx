@@ -75,7 +75,7 @@ const Signup = () => {
 
       <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-sm animate-fadeIn">
         <div className="flex justify-center my-4">
-          <img src={Logo} alt="Logo" className="w-24" />
+          <Link to="/"><img src={Logo} alt="Logo" className="w-24" /></Link>
         </div>
         <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-white">
           Create Account

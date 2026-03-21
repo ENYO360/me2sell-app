@@ -229,7 +229,7 @@ export default function Login() {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Logo */}
         <div className="flex justify-center pt-8 pb-4">
-          <img src={Logo} alt="Logo" className="w-24 hover:scale-105 transition" />
+          <Link to="/"><img src={Logo} alt="Logo" className="w-24 hover:scale-105 transition" /></Link>
         </div>
 
         {/* Tab switcher */}
