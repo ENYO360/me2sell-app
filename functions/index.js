@@ -82,3 +82,6 @@ exports.syncMarketplaceProduct = onDocumentWritten(
 
 exports.sellerInfo = require("./sellerInfo");
 exports.locationSync = require("./locationSync");
+
+const staffManagement = require("./staffManagement");
+exports["staffManagement-updateStaffStatus"] = staffManagement["staffManagement-updateStaffStatus"];

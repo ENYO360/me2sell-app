@@ -165,14 +165,6 @@ export default function StaffManagement() {
     const [permissions, setPermissions] = useState({
       departments: [],
       categories: [],
-      canEditStock: false,
-      canDeleteProducts: false,
-      canViewAllSales: false,
-      canProcessRefunds: false,
-      canManageCustomers: false,
-      canAccessReports: false,
-      canManagePricing: false,
-      canExportData: false,
     });
 
     const [departments, setDepartments] = useState([]);
@@ -254,6 +246,7 @@ export default function StaffManagement() {
         await setDoc(doc(db, 'staff', staffUid), {
           businessId: adminUid,
           email: formData.email,
+          password: formData.password,
           fullName: formData.fullName,
           phone: formData.phone || '',
           role: formData.role,
@@ -269,7 +262,7 @@ export default function StaffManagement() {
           staffId: staffUid,
           staffName: formData.fullName,
           action: 'staff_created',
-          details: { role: formData.role, email: formData.email },
+          details: { role: formData.role, email: formData.email, password: formData.password },
           timestamp: serverTimestamp(),
         });
 
@@ -519,43 +512,6 @@ export default function StaffManagement() {
                             <span className="text-sm text-gray-700 dark:text-gray-300">
                               {cat.name}
                             </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Other Permissions */}
-                    <div>
-                      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 block">
-                        Additional Permissions
-                      </label>
-
-                      <div className="space-y-2">
-                        {[
-                          { key: 'canEditStock', label: 'Edit Stock Levels' },
-                          { key: 'canDeleteProducts', label: 'Delete Products' },
-                          { key: 'canViewAllSales', label: 'View All Sales (not just own)' },
-                          { key: 'canProcessRefunds', label: 'Process Refunds' },
-                          { key: 'canManageCustomers', label: 'Manage Customers' },
-                          { key: 'canAccessReports', label: 'Access Reports' },
-                          { key: 'canManagePricing', label: 'Manage Pricing' },
-                          { key: 'canExportData', label: 'Export Data' },
-                        ].map((perm) => (
-                          <label
-                            key={perm.key}
-                            className="flex items-center justify-between p-3 border dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                          >
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                              {perm.label}
-                            </span>
-                            <input
-                              type="checkbox"
-                              checked={permissions[perm.key]}
-                              onChange={(e) =>
-                                setPermissions({ ...permissions, [perm.key]: e.target.checked })
-                              }
-                              className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                            />
                           </label>
                         ))}
                       </div>
@@ -810,43 +766,6 @@ export default function StaffManagement() {
                       ))}
                     </div>
                   </div>
-
-                  {/* Other Permissions */}
-                  <div>
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 block">
-                      Additional Permissions
-                    </label>
-
-                    <div className="space-y-2">
-                      {[
-                        { key: 'canEditStock', label: 'Edit Stock Levels' },
-                        { key: 'canDeleteProducts', label: 'Delete Products' },
-                        { key: 'canViewAllSales', label: 'View All Sales (not just own)' },
-                        { key: 'canProcessRefunds', label: 'Process Refunds' },
-                        { key: 'canManageCustomers', label: 'Manage Customers' },
-                        { key: 'canAccessReports', label: 'Access Reports' },
-                        { key: 'canManagePricing', label: 'Manage Pricing' },
-                        { key: 'canExportData', label: 'Export Data' },
-                      ].map((perm) => (
-                        <label
-                          key={perm.key}
-                          className="flex items-center justify-between p-3 border dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                        >
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {perm.label}
-                          </span>
-                          <input
-                            type="checkbox"
-                            checked={permissions[perm.key] || false}
-                            onChange={(e) =>
-                              setPermissions({ ...permissions, [perm.key]: e.target.checked })
-                            }
-                            className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                        </label>
-                      ))}
-                    </div>
-                  </div>
                 </>
               )}
             </div>
@@ -1068,6 +987,7 @@ export default function StaffManagement() {
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                               {member.email}
                             </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{member.password}</p>
                           </div>
                         </div>
                       </td>
