@@ -1,14 +1,15 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 
-const db = admin.firestore();
-const FieldValue = admin.firestore.FieldValue;
-
 exports["staffManagement-updateStaffStatus"] = onCall(
   {
     cors: [/localhost/, "https://sales-book-d66c5.web.app", "https://sales-book-d66c5.firebaseapp.com"],
   },
   async (request) => {
+
+    // Initialized here, not at module level — admin is ready by the time this runs
+    const db = admin.firestore();
+    const FieldValue = admin.firestore.FieldValue;
 
     // 1. Auth guard
     if (!request.auth) {

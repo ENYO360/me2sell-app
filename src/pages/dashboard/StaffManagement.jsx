@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { httpsCallable } from 'firebase/functions';
 import { motion } from 'framer-motion';
 import {
   collection,
@@ -14,7 +13,7 @@ import {
   addDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { auth, db, functions, firebaseConfig } from '../../firebase/config'; // ✅ import firebaseConfig
+import { auth, db, firebaseConfig } from '../../firebase/config'; // ✅ import firebaseConfig
 import {
   createUserWithEmailAndPassword,
   updateProfile,
@@ -124,8 +123,8 @@ export default function StaffManagement() {
   const handleDeleteStaff = async (staffId, staffName) => {
     if (!window.confirm(`Delete ${staffName}?`)) return;
     try {
-      await deleteDoc(doc(db, 'staff', staffId));
       await deleteDoc(doc(db, 'users', staffId));
+      await deleteDoc(doc(db, 'staff', staffId));
 
       setStaff(staff.filter((s) => s.id !== staffId));
       alert('Staff deleted');
@@ -136,13 +135,15 @@ export default function StaffManagement() {
   };
 
   const handleActivateStaff = async (staffId) => {
+    if (!window.confirm('Activate this staff member?')) return;
     try {
-      const updateStatus = httpsCallable(functions, 'staffManagement-updateStaffStatus');
-
-      await updateStatus({ staffId, status: 'active' });
+      await updateDoc(doc(db, 'staff', staffId), {
+        status: 'active',
+        updatedAt: serverTimestamp(),
+      });
+      await updateDoc(doc(db, 'users', staffId), { status: 'active' });
 
       setStaff(staff.map((s) => (s.id === staffId ? { ...s, status: 'active' } : s)));
-
       alert('Staff activated successfully');
     } catch (error) {
       console.error('Error activating staff:', error);
@@ -239,6 +240,7 @@ export default function StaffManagement() {
           email: formData.email,
           role: 'staff',
           businessId: adminUid,
+          status: 'active',
           createdAt: serverTimestamp(),
           lastLogin: null,
         });

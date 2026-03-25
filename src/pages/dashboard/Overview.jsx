@@ -20,7 +20,7 @@ import {
 // ── Shared product card (search results) ─────────────────────────────────────
 function ProductCard({ product, currency, addToCart, startSale, lowStockThreshold }) {
   const isLowStock = product.quantity > 0 && product.quantity <= lowStockThreshold;
-  const isOut      = product.quantity === 0;
+  const isOut = product.quantity === 0;
 
   return (
     <motion.div
@@ -73,16 +73,16 @@ function ProductCard({ product, currency, addToCart, startSale, lowStockThreshol
 export default function Overview() {
   const navigate = useNavigate();
 
-  const [filters, setFilters]       = useState({ salesRange: "day" });
-  const [stats, setStats]           = useState(null);
+  const [filters, setFilters] = useState({ salesRange: "day" });
+  const [stats, setStats] = useState(null);
   const [customMode, setCustomMode] = useState(false);
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
 
-  const { results, setScope }                             = useSearch();
-  const { addToCart }                                     = useCart();
-  const { startSale }                                     = useDirectSale();
-  const { currency }                                      = useCurrency();
-  const { products, lowStockThreshold }                   = useProducts();
+  const { results, setScope } = useSearch();
+  const { addToCart } = useCart();
+  const { startSale } = useDirectSale();
+  const { currency } = useCurrency();
+  const { products, lowStockThreshold } = useProducts();
   const { getStatsByRange, getStatsByCustomRange, loading } = useDashboard();
 
   useEffect(() => { setScope("all-products"); }, []);
@@ -99,7 +99,7 @@ export default function Overview() {
   const applyCustomFilter = async () => {
     if (!customRange.start || !customRange.end) return;
     const start = new Date(customRange.start);
-    const end   = new Date(customRange.end);
+    const end = new Date(customRange.end);
     if ((end - start) / (1000 * 60 * 60 * 24) > 90) {
       alert("Please select a range of 90 days or less.");
       return;
@@ -109,12 +109,12 @@ export default function Overview() {
     setCustomMode(true);
   };
 
-  const inStock       = products.filter((p) => p.quantity > 0).length;
-  const lowStock      = products.filter((p) => p.quantity > 0 && p.quantity <= lowStockThreshold).length;
-  const outOfStock    = products.filter((p) => p.quantity === 0).length;
+  const inStock = products.filter((p) => p.quantity > 0).length;
+  const lowStock = products.filter((p) => p.quantity > 0 && p.quantity <= lowStockThreshold).length;
+  const outOfStock = products.filter((p) => p.quantity === 0).length;
   const inStockAmount = products
     .filter((p) => Number(p.quantity) > 0)
-    .reduce((sum, p) => sum + Number(p.quantity) * Number(p.sellingPrice || 0), 0);
+    .reduce((sum, p) => sum + Number(p.quantity) * Number(p.costPrice || 0), 0);
 
   const dashboard = stats ?? {
     salesCount: 0, salesAmount: 0, profitAmount: 0, topProduct: null,
@@ -122,8 +122,8 @@ export default function Overview() {
   };
 
   const RANGES = [
-    { value: "day",   label: "Today"      },
-    { value: "week",  label: "This Week"  },
+    { value: "day", label: "Today" },
+    { value: "week", label: "This Week" },
     { value: "month", label: "This Month" },
   ];
 
@@ -169,11 +169,10 @@ export default function Overview() {
               <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 mr-1">Range</span>
               {RANGES.map((r) => (
                 <button key={r.value} onClick={() => setFilters({ ...filters, salesRange: r.value })}
-                  className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-all ${
-                    filters.salesRange === r.value && !customMode
+                  className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-all ${filters.salesRange === r.value && !customMode
                       ? "bg-blue-500 text-white shadow-md shadow-[#03165A]/20"
                       : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                  }`}>
+                    }`}>
                   {r.label}
                 </button>
               ))}

@@ -1,6 +1,7 @@
 import './index.css';
 import GlobalLoader from './pages/GlobalLoader';
 import { useLoading } from './context/LoadingContext';
+import useAutoLogout from './hooks/useAutoLogout';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Home from './pages/Home';
 import { Router, Route, Routes} from 'react-router-dom';
@@ -33,6 +34,7 @@ import SellerProfile from './pages/marketplace/SellerProfile';
 
 function App() {
   const { loading } = useLoading();
+  useAutoLogout();
 
   return (
     <>
