@@ -84,81 +84,57 @@ exports.syncMarketplaceProduct = onDocumentWritten(
 exports.sellerInfo = require("./sellerInfo");
 exports.locationSync = require("./locationSync");
 
-// ── Staff Management ──────────────────────────────────────────────────────────
-exports["staffManagement-updateStaffStatus"] = onCall(
-  {
-    cors: [/localhost/, "https://sales-book-d66c5.web.app", "https://sales-book-d66c5.firebaseapp.com"],
-  },
-  async (request) => {
-    const db = admin.firestore();
-    const FieldValue = admin.firestore.FieldValue;
+const algoliasearch = require("algoliasearch");
+const { defineString } = require("firebase-functions/params");
 
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "You must be signed in.");
+const ALGOLIA_APP_ID  = defineString("ALGOLIA_APP_ID");
+const ALGOLIA_API_KEY = defineString("ALGOLIA_API_KEY");
+const ALGOLIA_INDEX   = "marketplace_products";
+
+exports.syncProductToAlgolia = onDocumentWritten(
+    "marketplaceProducts/{productId}",
+    async (event) => {
+        const productId = event.params.productId;
+        const after  = event.data?.after;
+        const before = event.data?.before;
+
+        const algoliaClient = algoliasearch(
+            ALGOLIA_APP_ID.value(),
+            ALGOLIA_API_KEY.value()
+        );
+        const algoliaIndex = algoliaClient.initIndex(ALGOLIA_INDEX);
+
+        // Deleted — remove from Algolia index
+        if (!after?.exists) {
+            await algoliaIndex.deleteObject(productId);
+            return;
+        }
+
+        const data = after.data();
+
+        const record = {
+            objectID:       productId,
+            name:           data.name           || "",
+            description:    data.description    || "",
+            categoryId:     data.categoryId     || "",
+            department:     data.department     || "",
+            businessName:   data.businessName   || "",
+            businessType:   data.businessType   || "",
+            sellerId:       data.sellerId       || "",
+            sellingPrice:   data.sellingPrice   || 0,
+            currencySymbol: data.currencySymbol || "",
+            image:          data.image          || "",
+            image2:         data.image2         || "",
+            quantity:       data.quantity       || 0,
+            sold:           data.sold           || 0,
+            address:        data.address        || "",
+            country:        data.country        || "",
+            phone:          data.phone          || "",
+            whatsappLink:   data.whatsappLink   || "",
+            location:       data.location       || null,
+            updatedAt:      data.updatedAt?.toMillis?.() || Date.now(),
+        };
+
+        await algoliaIndex.saveObject(record);
     }
-
-    const callerUid = request.auth.uid;
-    const { staffId, status } = request.data;
-
-    if (!staffId || typeof staffId !== "string") {
-      throw new HttpsError("invalid-argument", "staffId is required.");
-    }
-
-    const allowedStatuses = ["active", "suspended"];
-    if (!status || !allowedStatuses.includes(status)) {
-      throw new HttpsError(
-        "invalid-argument",
-        `status must be one of: ${allowedStatuses.join(", ")}.`
-      );
-    }
-
-    const staffRef = db.collection("staff").doc(staffId);
-    const staffSnap = await staffRef.get();
-
-    if (!staffSnap.exists) {
-      throw new HttpsError("not-found", "Staff member not found.");
-    }
-
-    const staffData = staffSnap.data();
-
-    if (staffData.businessId !== callerUid) {
-      throw new HttpsError(
-        "permission-denied",
-        "You do not have permission to manage this staff member."
-      );
-    }
-
-    if (staffData.status === status) {
-      return {
-        success: true,
-        message: `Staff is already ${status}. No changes made.`,
-        staffId,
-        status,
-      };
-    }
-
-    const batch = db.batch();
-    batch.update(staffRef, { status, updatedAt: FieldValue.serverTimestamp() });
-
-    const userRef = db.collection("users").doc(staffId);
-    batch.update(userRef, { status, updatedAt: FieldValue.serverTimestamp() });
-
-    await batch.commit();
-
-    await db.collection("staffActivity").add({
-      businessId: callerUid,
-      staffId,
-      staffName: staffData.fullName || "",
-      action: status === "active" ? "staff_activated" : "staff_suspended",
-      details: { previousStatus: staffData.status, newStatus: status },
-      timestamp: FieldValue.serverTimestamp(),
-    });
-
-    return {
-      success: true,
-      message: `Staff ${status === "active" ? "activated" : "suspended"} successfully.`,
-      staffId,
-      status,
-    };
-  }
 );

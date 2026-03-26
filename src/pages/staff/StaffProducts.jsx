@@ -293,7 +293,7 @@ function ProductCard({ product, currency, isLowStock, ownerLoading, onAddToCart,
                     <button
                         onClick={() => onAddToCart(product)}
                         disabled={isOut || ownerLoading}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm dark:text-gray-300 dark:bg-gray-700 shadow-[#03165A]/20"
                     >
                         <FaShoppingCart className="text-xs" />
                         {ownerLoading ? 'Loading...' : 'Add'}
@@ -302,7 +302,7 @@ function ProductCard({ product, currency, isLowStock, ownerLoading, onAddToCart,
                     <button
                         onClick={() => onDirectSell(product)}
                         disabled={isOut || ownerLoading}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm dark:text-gray-300 dark:bg-gray-700 shadow-[#03165A]/20"
                     >
                         <FaMoneyBillWave className="text-xs" />
                         Sell

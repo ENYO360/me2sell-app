@@ -18,6 +18,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { MARKETPLACE_CATEGORIES } from "../marketplaceCategories";
+import { searchProductsAlgolia, searchSellersAlgolia } from "../utils/algoliaSearch";
 
 const MarketplaceContext = createContext();
 
@@ -179,51 +180,27 @@ export function MarketplaceProvider({ children }) {
     // Search Products Fetch
     const searchProducts = async ({ queryText, reset = false }) => {
         if (!queryText?.trim()) return;
-        if (fetchingRef.current || (!hasMore && !reset)) return;
 
-        searchSellers(queryText);
-
-        fetchingRef.current = true;
-        setLoading(true);
+        // Search sellers instantly in parallel (Algolia, client deduped)
+        searchSellersAlgolia(queryText).then(setSellerResults).catch(console.error);
 
         if (reset) {
             setIsSearching(true);
-            lastSearchDocRef.current = null;
             setProducts([]);
-            setHasMoreSearch(true);
+            setHasMoreSearch(false);
         }
 
+        setLoading(true);
+
         try {
-            const constraints = [
-                where("nameLower", ">=", queryText.toLowerCase()),
-                where("nameLower", "<=", queryText.toLowerCase() + "\uf8ff"),
-                orderBy("nameLower"),
-                limit(PAGE_SIZE),
-            ];
+            const page = reset ? 0 : Math.floor(products.length / 20);
+            const { hits, nbPages } = await searchProductsAlgolia(queryText, page);
 
-            if (!reset && lastSearchDocRef.current) {
-                constraints.push(startAfter(lastSearchDocRef.current));
-            }
-
-            const q = query(
-                collection(db, "marketplaceProducts"),
-                ...constraints
-            );
-
-            const snap = await getDocs(q);
-            const newItems = snap.docs.map((d) => ({
-                id: d.id,
-                ...d.data(),
-            }));
-
-            lastSearchDocRef.current = snap.docs.at(-1) || null;
-            setHasMoreSearch(snap.docs.length === PAGE_SIZE);
-
-            setProducts((prev) =>
-                reset ? newItems : mergeUniqueById(prev, newItems)
-            );
+            setHasMoreSearch(page + 1 < nbPages);
+            setProducts(prev => reset ? hits : mergeUniqueById(prev, hits));
+        } catch (err) {
+            console.error("Algolia search error:", err);
         } finally {
-            fetchingRef.current = false;
             setLoading(false);
         }
     };
@@ -233,98 +210,15 @@ export function MarketplaceProvider({ children }) {
         setSearchQuery("");
         setIsSearching(false);
         setSellerResults([]);
-        lastSearchDocRef.current = null;
-
-        lastDocRef.current = null;
-        setHasMoreSearch(true);
         setProducts([]);
+        setHasMoreSearch(false);
 
         if (activeCategory === "all") {
             await fetchProducts({ reset: true });
         } else {
-            const category = MARKETPLACE_CATEGORIES.find(
-                (c) => c.id === activeCategory
-            );
-            if (category) {
-                await fetchProducts({
-                    categoryId: category.id,
-                    reset: true,
-                });
-            }
+            const category = MARKETPLACE_CATEGORIES.find(c => c.id === activeCategory);
+            if (category) await fetchProducts({ categoryId: category.id, reset: true });
         }
-    };
-
-    /* ---------------- FETCH SELLERS ---------------- */
-    const fetchSellers = async () => {
-        // Check cache first
-        try {
-            const raw = localStorage.getItem(SELLERS_CACHE_KEY);
-            if (raw) {
-                const cached = JSON.parse(raw);
-                if (!isCacheStale(cached.savedAt, SELLERS_CACHE_TTL)) {
-                    setSellers(cached.sellers);
-                    return;
-                }
-            }
-        } catch { }
-
-        setLoadingSellers(true);
-        try {
-            const snap = await getDocs(
-                query(collection(db, "marketplaceProducts"), limit(200))
-            );
-
-            // Dedupe by sellerId, keep richest data
-            const map = new Map();
-            snap.docs.forEach((d) => {
-                const p = d.data();
-                if (!p.sellerId) return;
-                if (map.has(p.sellerId)) {
-                    map.get(p.sellerId).productCount += 1;
-                } else {
-                    map.set(p.sellerId, {
-                        sellerId: p.sellerId,
-                        businessName: p.businessName || "Unknown Store",
-                        businessType: p.businessType || "",
-                        address: p.address || "",
-                        country: p.country || "",
-                        phone: p.phone || "",
-                        whatsappLink: p.whatsappLink || "",
-                        productCount: 1,
-                    });
-                }
-            });
-
-            const list = Array.from(map.values())
-                .sort((a, b) => b.productCount - a.productCount);
-
-            setSellers(list);
-            localStorage.setItem(SELLERS_CACHE_KEY, JSON.stringify({
-                sellers: list,
-                savedAt: Date.now(),
-            }));
-        } catch (err) {
-            console.error("fetchSellers failed:", err);
-        } finally {
-            setLoadingSellers(false);
-        }
-    };
-
-    /* ---------------- SEARCH SELLERS ---------------- */
-    const searchSellers = (queryText) => {
-        if (!queryText?.trim()) {
-            setSellerResults([]);
-            return;
-        }
-        const q = queryText.toLowerCase();
-        setSellerResults(
-            sellers.filter(s =>
-                s.businessName?.toLowerCase().includes(q) ||
-                s.businessType?.toLowerCase().includes(q) ||
-                s.address?.toLowerCase().includes(q) ||
-                s.country?.toLowerCase().includes(q)
-            )
-        );
     };
 
     /* ---------------- INIT ---------------- */
@@ -345,7 +239,6 @@ export function MarketplaceProvider({ children }) {
             fetchProducts({ reset: true });
         }
 
-        fetchSellers();
     }, []);
 
     /* ---------------- CATEGORY SWITCH ---------------- */
@@ -447,8 +340,6 @@ export function MarketplaceProvider({ children }) {
                 sellers,
                 sellerResults,
                 loadingSellers,
-                fetchSellers,
-                searchSellers,
             }}
         >
             {children}
