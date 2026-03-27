@@ -109,10 +109,19 @@ export const DashboardProvider = ({ children }) => {
             profit += daily.profit || 0;
 
             // Support old + new formats
-            const productsMap =
-                daily.topProducts ||
-                daily.topProduct ||
-                {};
+            const productsMap = {};
+
+            Object.keys(daily).forEach(key => {
+                if (!key.startsWith("topProducts.")) return;
+
+                const [, productId, field] = key.split(".");
+
+                if (!productsMap[productId]) {
+                    productsMap[productId] = {};
+                }
+
+                productsMap[productId][field] = daily[key];
+            });
 
             Object.entries(productsMap).forEach(([id, info]) => {
                 if (!info) return;

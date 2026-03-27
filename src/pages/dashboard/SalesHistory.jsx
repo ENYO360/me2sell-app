@@ -67,7 +67,8 @@ const getDateRange = (range, startDate, endDate) => {
       end = endDate ? new Date(endDate + "T23:59:59.999") : end;
       break;
     default:
-      start = new Date("2000-01-01");
+    start = new Date();
+    start.setHours(0, 0, 0, 0);
   }
 
   return { start, end };
@@ -637,7 +638,7 @@ export default function SalesHistory() {
   const [receiptSale, setReceiptSale] = useState(null);
 
   const [filters, setFilters] = useState({
-    range: "all",
+    range: "today",
     startDate: "",
     endDate: "",
   });
@@ -766,7 +767,7 @@ export default function SalesHistory() {
               </h2>
 
               <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border dark:border-slate-700">
-                {["today", "week", "month", "all"].map((r) => (
+                {["today", "week", "month"].map((r) => (
                   <button
                     key={r}
                     onClick={() => setFilters({ range: r, startDate: "", endDate: "" })}
