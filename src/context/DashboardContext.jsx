@@ -47,7 +47,9 @@ const getRangeDates = (range) => {
 
         case "week":
             start = new Date(end);
-            start.setDate(end.getDate() - 6);
+            const day = end.getDay(); // 0=Sun, 1=Mon...6=Sat
+            const daysSinceMonday = day === 0 ? 6 : day - 1;
+            start.setDate(end.getDate() - daysSinceMonday);
             break;
 
         case "month":

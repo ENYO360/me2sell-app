@@ -61,14 +61,14 @@ function FeatureCard({ icon: Icon, title, desc, gradient, delay }) {
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay }}
       whileHover={{ y: -6, scale: 1.02 }}
-      className="relative group bg-white rounded-3xl p-7 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden"
+      className="flex flex-col justify-center items-center relative group bg-white rounded-3xl p-7 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden"
     >
       <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 bg-gradient-to-br ${gradient}`} />
-      <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} mb-5 shadow-lg`}>
+      <div className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} mb-5 shadow-lg`}>
         <Icon className="text-white text-2xl" />
       </div>
-      <h4 className="font-bold text-gray-900 text-lg mb-2">{title}</h4>
-      <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+      <h4 className="font-bold text-center text-gray-900 text-lg mb-2">{title}</h4>
+      <p className="text-gray-500 text-center text-sm leading-relaxed">{desc}</p>
     </motion.div>
   );
 }
@@ -479,7 +479,7 @@ function SellerHome({ user, dashboardPath }) {
                 className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-7 py-4 rounded-2xl font-bold hover:bg-green-500 transition-all duration-200 shadow-lg shadow-green-600/30 hover:-translate-y-0.5">
                 <FaSearch size={14} /> Explore Marketplace
               </Link>
-              <Link to={user ? dashboardPath : "/signup"}
+              <Link to={user ? dashboardPath : "/login"}
                 className="inline-flex items-center justify-center gap-2 border border-gray-600 text-gray-300 px-7 py-4 rounded-2xl font-bold hover:border-gray-400 hover:text-white transition-all duration-200">
                 <MdSpaceDashboard size={16} /> My Dashboard
               </Link>
@@ -532,12 +532,12 @@ function SellerHome({ user, dashboardPath }) {
 
 /* ── MAIN LANDING ────────────────────────────────────────────── */
 export default function Landing() {
-  const [user,        setUser]        = useState(null);
+  const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [menuOpen,    setMenuOpen]    = useState(false);
-  const [userRole,    setUserRole]    = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
-  const menuRef       = useRef(null);
+  const menuRef = useRef(null);
   const menuButtonRef = useRef(null);
 
   const { mode, toggleMode, isSeller, isBuyer } = useMode();
@@ -563,7 +563,7 @@ export default function Landing() {
   useEffect(() => {
     const handler = (e) => {
       if (menuOpen && menuRef.current && !menuRef.current.contains(e.target) &&
-          menuButtonRef.current && !menuButtonRef.current.contains(e.target)) {
+        menuButtonRef.current && !menuButtonRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
     };
@@ -574,7 +574,7 @@ export default function Landing() {
 
   const logout = async () => { await auth.signOut(); setUserRole(null); };
 
-  const dashboardPath  = isSeller ? (userRole === "staff" ? "/staff/dashboard" : "/dashboard") : "/marketplace";
+  const dashboardPath = isSeller ? (userRole === "staff" ? "/staff/dashboard" : "/dashboard") : "/marketplace";
   const dashboardLabel = isSeller ? (userRole === "staff" ? "Staff Dashboard" : "Dashboard") : "Marketplace";
 
   return (
@@ -686,7 +686,7 @@ export default function Landing() {
                       {dashboardLabel}
                     </Link>
                     <Link to="/marketplace" onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-green-600 transition py-2">
+                      className={`${isBuyer ? "hidden" : "flex"} items-center gap-2 text-sm font-semibold text-gray-700 hover:text-green-600 transition py-2`}>
                       Marketplace
                     </Link>
                     <button onClick={() => { logout(); setMenuOpen(false); }}
