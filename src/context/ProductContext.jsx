@@ -21,16 +21,16 @@ import { usePermissions } from "../hooks/usePermissions";
 const ProductContext = createContext();
 export const useProducts = () => useContext(ProductContext);
 
-const CACHE_KEY       = "products_cache_v1";
-const PROFILE_CACHE   = "business_profile_cache_v1";
+const CACHE_KEY = "products_cache_v1";
+const PROFILE_CACHE = "business_profile_cache_v1";
 const THRESHOLD_CACHE = "low_stock_threshold_cache";
-const VERSION_CACHE   = "products_version_cache";
+const VERSION_CACHE = "products_version_cache";
 
 export const ProductProvider = ({ children }) => {
-  const [allProducts,       setAllProducts]       = useState([]);
-  const [loading,           setLoading]           = useState(true);
-  const [profile,           setProfile]           = useState(null);
-  const [loadingProfile,    setLoadingProfile]    = useState(true);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const [lowStockThreshold, setLowStockThreshold] = useState(15);
 
   const lastFetchedVersion = useRef(null);
@@ -50,12 +50,12 @@ export const ProductProvider = ({ children }) => {
   useEffect(() => {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
-      try { setAllProducts(JSON.parse(cached)); } catch {}
+      try { setAllProducts(JSON.parse(cached)); } catch { }
     }
 
     const cachedProfile = localStorage.getItem(PROFILE_CACHE);
     if (cachedProfile) {
-      try { setProfile(JSON.parse(cachedProfile)); setLoadingProfile(false); } catch {}
+      try { setProfile(JSON.parse(cachedProfile)); setLoadingProfile(false); } catch { }
     }
 
     const cachedThreshold = localStorage.getItem(THRESHOLD_CACHE);
@@ -79,7 +79,31 @@ export const ProductProvider = ({ children }) => {
       const snap = await getDocs(
         collection(db, "products", ownerId, "productList")
       );
-      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const list = snap.docs
+        .map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            name: data.name || "",
+            sellingPrice: Number(data.sellingPrice) || 0,
+            costPrice: Number(data.costPrice) || 0,
+            quantity: Number(data.quantity) || 0,
+            categoryId: data.categoryId || "",
+            departmentId: data.departmentId || "",
+            department: data.department || "",
+            category: data.category || "",
+            image: data.image || "",
+            image2: data.image2 || "",
+            description: data.description || "",
+            barcode: data.barcode || "",
+            sku: data.sku || "",
+            uid: data.uid || "",
+            pushToMarketplace: data.pushToMarketplace ?? true,
+            updatedAt: data.updatedAt || null,
+            createdAt: data.createdAt || null,
+          };
+        })
+        .filter((p) => p.name); //drop docs with no name at all
       setAllProducts(list);
 
       // Write fresh data back to cache
@@ -220,7 +244,7 @@ export const ProductProvider = ({ children }) => {
     if (isStaff) {
       return allProducts.filter((product) => {
         if (product.departmentId && !canAccessDepartment(product.departmentId)) return false;
-        if (product.categoryId   && !canAccessCategory(product.categoryId))     return false;
+        if (product.categoryId && !canAccessCategory(product.categoryId)) return false;
         return true;
       });
     }
@@ -240,9 +264,9 @@ export const ProductProvider = ({ children }) => {
   const getProductStats = useCallback(() => {
     const list = getFilteredProducts();
     return {
-      totalProducts:   list.length,
-      totalValue:      list.reduce((s, p) => s + (p.sellingPrice || 0) * (p.quantity || 0), 0),
-      lowStockItems:   list.filter((p) => p.quantity > 0 && p.quantity <= lowStockThreshold).length,
+      totalProducts: list.length,
+      totalValue: list.reduce((s, p) => s + (p.sellingPrice || 0) * (p.quantity || 0), 0),
+      lowStockItems: list.filter((p) => p.quantity > 0 && p.quantity <= lowStockThreshold).length,
       outOfStockItems: list.filter((p) => p.quantity === 0).length,
     };
   }, [getFilteredProducts, lowStockThreshold]);
@@ -267,7 +291,7 @@ export const ProductProvider = ({ children }) => {
     if (!product) return false;
     if (isStaff) {
       if (product.departmentId && !canAccessDepartment(product.departmentId)) return false;
-      if (product.categoryId   && !canAccessCategory(product.categoryId))     return false;
+      if (product.categoryId && !canAccessCategory(product.categoryId)) return false;
     }
     return true;
   }, [allProducts, isAdmin, isStaff, canAccessDepartment, canAccessCategory]);

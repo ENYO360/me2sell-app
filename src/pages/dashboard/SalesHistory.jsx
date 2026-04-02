@@ -96,7 +96,7 @@ const Receipt = React.forwardRef(({ sale, currency, profile, logoSrc }, ref) => 
       style={{
         width: "320px",
         backgroundColor: "#ffffff",
-        fontFamily: "'Courier New', Courier, monospace",
+        fontFamily: "monospace, sans-serif",
         padding: "24px 20px",
         color: "#111111",
         boxSizing: "border-box",
@@ -108,21 +108,21 @@ const Receipt = React.forwardRef(({ sale, currency, profile, logoSrc }, ref) => 
         <div style={{ fontSize: "16px", fontWeight: "800", letterSpacing: "2px", textTransform: "uppercase" }}>
           {profile?.business?.businessName || "My Business"}
         </div>
-        <div style={{ fontSize: "11px", marginTop: "4px", color: "#555" }}>
+        <div style={{ fontSize: "11px", color: "#555" }}>
           {profile?.business?.businessType || ""}
         </div>
         {profile?.business?.businessAddress && (
-          <div style={{ fontSize: "11px", color: "#555", marginTop: "2px" }}>
+          <div style={{ fontSize: "10px",  marginTop: "2px" }}>
             {profile.business.businessAddress}
           </div>
         )}
-        {profile?.business?.location?.city && (
-          <div style={{ fontSize: "11px", color: "#555" }}>
-            {profile.business.location.city}, {profile.business.location.state}
+        {profile?.business?.location?.country && (
+          <div style={{ fontSize: "10px" }}>
+            {profile.business.location.country}
           </div>
         )}
         {profile?.admin?.phone?.full && (
-          <div style={{ fontSize: "11px", color: "#555", marginTop: "2px" }}>
+          <div style={{ fontSize: "11px", marginTop: "2px" }}>
             Tel: {profile.admin.phone.full}
           </div>
         )}

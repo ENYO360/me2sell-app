@@ -39,7 +39,7 @@ function Orbs({ seller }) {
   );
 }
 
-/* ── Animated counter ────────────────────────────────────────── */
+/* ── Animated counter*/
 function Counter({ to, suffix = "" }) {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -52,7 +52,7 @@ function Counter({ to, suffix = "" }) {
   return <>{count.toLocaleString()}{suffix}</>;
 }
 
-/* ── Seller feature card ─────────────────────────────────────── */
+/* ── Seller feature card */
 function FeatureCard({ icon: Icon, title, desc, gradient, delay }) {
   return (
     <motion.div
@@ -70,10 +70,10 @@ function FeatureCard({ icon: Icon, title, desc, gradient, delay }) {
       <h4 className="font-bold text-center text-gray-900 text-lg mb-2">{title}</h4>
       <p className="text-gray-500 text-center text-sm leading-relaxed">{desc}</p>
     </motion.div>
-  );
+  ); 
 }
 
-/* ── Buyer step card ─────────────────────────────────────────── */
+/* ── Buyer step card */
 function StepCard({ icon: Icon, step, title, desc, delay }) {
   return (
     <motion.div
@@ -96,7 +96,7 @@ function StepCard({ icon: Icon, step, title, desc, delay }) {
   );
 }
 
-/* ── BUYER HOME ──────────────────────────────────────────────── */
+/* ── BUYER HOME */
 function BuyerHome({ user }) {
   const words = ["Faster", "Smarter", "Easier", "Better"];
   const [wordIdx, setWordIdx] = useState(0);
@@ -298,7 +298,7 @@ function BuyerHome({ user }) {
   );
 }
 
-/* ── SELLER HOME ─────────────────────────────────────────────── */
+/* ── SELLER HOME */
 function SellerHome({ user, dashboardPath }) {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 400], [0, -60]);
@@ -530,7 +530,7 @@ function SellerHome({ user, dashboardPath }) {
   );
 }
 
-/* ── MAIN LANDING ────────────────────────────────────────────── */
+/* ── MAIN LANDING */
 export default function Landing() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -582,7 +582,7 @@ export default function Landing() {
       <Orbs seller={isSeller} />
 
       {/* ── HEADER ── */}
-      <header className="z-50 sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
+      <header className="z-50 fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
 
           {/* Logo */}
@@ -713,7 +713,7 @@ export default function Landing() {
       </header>
 
       {/* ── MAIN CONTENT ── */}
-      <main className="relative z-10 flex-1">
+      <main className="relative z-10 flex-1 pt-24">
         <AnimatePresence mode="wait">
           {isBuyer ? (
             <motion.div key="buyer" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
