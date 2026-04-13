@@ -113,10 +113,17 @@ export const ProductProvider = ({ children }) => {
     }
   }, []);
 
+<<<<<<< HEAD
   /* 
      MAIN SETUP — auth + version snapshot
      loading=false only set after snapshot resolves.
   */
+=======
+  /* ─────────────────────────────────────────────────────────────
+     MAIN SETUP — auth + version snapshot
+     loading=false only set after snapshot resolves.
+  ───────────────────────────────────────────────────────────── */
+>>>>>>> bc4c366b3d4711e568b3254c73c74cf008cfdafb
   useEffect(() => {
     let unsubscribeSnapshot = null;
 
@@ -141,7 +148,11 @@ export const ProductProvider = ({ children }) => {
       }
 
       try {
+<<<<<<< HEAD
         // ownerId — staff use their employer's businessId
+=======
+        // Resolve ownerId — staff use their employer's businessId
+>>>>>>> bc4c366b3d4711e568b3254c73c74cf008cfdafb
         let ownerId = user.uid;
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists() && userDoc.data().role === "staff") {
@@ -207,9 +218,15 @@ export const ProductProvider = ({ children }) => {
     };
   }, [fetchProducts]);
 
+<<<<<<< HEAD
   /* 
      UPDATE LOW STOCK THRESHOLD
    */
+=======
+  /* ─────────────────────────────────────────────────────────────
+     UPDATE LOW STOCK THRESHOLD
+  ───────────────────────────────────────────────────────────── */
+>>>>>>> bc4c366b3d4711e568b3254c73c74cf008cfdafb
   const updateLowStockThreshold = useCallback(async (newThreshold) => {
     try {
       const user = auth.currentUser;
@@ -235,9 +252,15 @@ export const ProductProvider = ({ children }) => {
     }
   }, []);
 
+<<<<<<< HEAD
   /*
      PERMISSION-FILTERED PRODUCTS
    */
+=======
+  /* ─────────────────────────────────────────────────────────────
+     PERMISSION-FILTERED PRODUCTS
+  ───────────────────────────────────────────────────────────── */
+>>>>>>> bc4c366b3d4711e568b3254c73c74cf008cfdafb
   const getFilteredProducts = useCallback(() => {
     if (permissionsLoading) return [];
     if (isAdmin) return allProducts;
@@ -301,7 +324,11 @@ export const ProductProvider = ({ children }) => {
     [lowStockThreshold]
   );
 
+<<<<<<< HEAD
   // Called by Products.jsx immediately after deleting a product ──
+=======
+  // ── Called by Products.jsx immediately after deleting a product ──
+>>>>>>> bc4c366b3d4711e568b3254c73c74cf008cfdafb
   // Removes the product from state + cache without waiting for the
   // version snapshot to round-trip, so the UI updates instantly.
   const removeProductFromCache = useCallback((productId) => {
