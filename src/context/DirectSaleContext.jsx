@@ -152,6 +152,8 @@ export const DirectSaleProvider = ({ children }) => {
                 }
 
                 const currentQty = productSnap.data().quantity || 0;
+                const pushToMarketplace = productSnap.data().pushToMarketplace || false;
+
                 if (currentQty < 1) {
                     throw new Error(`"${selectedProduct.name}" is out of stock.`);
                 }
@@ -204,10 +206,12 @@ export const DirectSaleProvider = ({ children }) => {
                 );
 
                 // ── 5. Update marketplace sold count ──
-                tx.update(marketplaceRef, {
-                    sold: increment(1),
-                    updatedAt: serverTimestamp(),
-                });
+                if (pushToMarketplace) {
+                    tx.update(marketplaceRef, {
+                        sold: increment(1),
+                        updatedAt: serverTimestamp(),
+                    });
+                }
             });
 
             // ── 6. Stamp product version so UI refreshes ──

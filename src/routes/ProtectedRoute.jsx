@@ -12,7 +12,6 @@ export default function ProtectedRoute({ children, requireAdmin = false, require
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <div className="text-center">
           <FaSpinner className="animate-spin text-4xl text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );

@@ -179,8 +179,8 @@ export default function Cart() {
               className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 active:scale-95 text-white text-sm font-bold rounded-2xl shadow-lg shadow-green-600/30 transition-all"
             >
               <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3z"/>
-                <path d="M16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3z" />
+                <path d="M16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
               </svg>
               Checkout
               <span className="bg-white/20 px-2 py-0.5 rounded-lg text-xs font-bold">
@@ -195,9 +195,9 @@ export default function Cart() {
           <div className="flex flex-col items-center justify-center py-28 space-y-4">
             <div className="w-20 h-20 rounded-3xl bg-[#03165A]/6 flex items-center justify-center">
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#03165A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.35">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 01-8 0"/>
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 01-8 0" />
               </svg>
             </div>
             <div className="text-center space-y-1">
@@ -322,8 +322,8 @@ export default function Cart() {
             >
               <motion.div
                 initial={{ scale: 0.94, opacity: 0, y: 24 }}
-                animate={{ scale: 1,    opacity: 1, y: 0  }}
-                exit={{    scale: 0.94, opacity: 0, y: 24 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.94, opacity: 0, y: 24 }}
                 transition={{ type: "spring", stiffness: 380, damping: 28 }}
                 onClick={(e) => e.stopPropagation()}
                 className="relative w-full sm:max-w-md bg-white sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl"
@@ -351,7 +351,7 @@ export default function Cart() {
                       className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition"
                     >
                       <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                        <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     </button>
                   </div>
@@ -397,13 +397,22 @@ export default function Cart() {
                     </button>
 
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const numericPrices = {};
                         Object.keys(editedPrices).forEach((id) => {
                           numericPrices[id] = Number(editedPrices[id]) || 0;
                         });
-                        checkoutCart(numericPrices);
-                        setCheckoutOpen(false);
+
+                        try {
+                          const success = await checkoutCart(numericPrices);
+
+                          if (success) {
+                            setCheckoutOpen(false); // close ONLY if successful
+                          }
+                        } catch (error) {
+                          console.error("Checkout failed:", error);
+                          // optionally show error message
+                        }
                       }}
                       className="flex-[2] relative overflow-hidden py-3.5 rounded-2xl text-sm font-bold text-white bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/30 active:scale-95 transition-all"
                     >
@@ -415,7 +424,7 @@ export default function Cart() {
                       ) : (
                         <span className="flex items-center justify-center gap-2">
                           <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
                           Confirm Order
                         </span>

@@ -257,7 +257,6 @@ export const CartProvider = ({ children }) => {
             const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
 
             await runTransaction(db, async (tx) => {
-
                 // ── 1. Stock checks (all under ownerId's productList) ──
                 const stockChecks = await Promise.all(
                     items.map(async (item) => {
@@ -281,7 +280,7 @@ export const CartProvider = ({ children }) => {
                             );
                         }
 
-                        return { productRef };
+                        return { productRef, pushToMarketplace: productSnap.data().pushToMarketplace || false };
                     })
                 );
 
@@ -325,12 +324,14 @@ export const CartProvider = ({ children }) => {
                 tx.set(dailyRef, dailyUpdate, { merge: true });
 
                 // ── 5. Update marketplace sold counts ──
-                items.forEach((item) => {
-                    const marketplaceRef = doc(db, "marketplaceProducts", item.productId);
-                    tx.update(marketplaceRef, {
-                        sold: increment(item.quantity),
-                        updatedAt: serverTimestamp(),
-                    });
+                items.forEach((item, index) => {
+                    if (stockChecks[index].pushToMarketplace) {
+                        const marketplaceRef = doc(db, "marketplaceProducts", item.productId);
+                        tx.update(marketplaceRef, {
+                            sold: increment(item.quantity),
+                            updatedAt: serverTimestamp(),
+                        });
+                    }
                 });
             });
 
@@ -340,11 +341,13 @@ export const CartProvider = ({ children }) => {
             setConfirming(false);
             openConfirm("Sale completed successfully! ✅");
             await clearCart();
+            return true;
 
         } catch (err) {
             setConfirming(false);
             console.error("Checkout failed:", err);
             openConfirm(err.message || "❌ Unable to complete checkout.");
+            return false;
         }
     };
 
