@@ -84,57 +84,72 @@ exports.syncMarketplaceProduct = onDocumentWritten(
 exports.sellerInfo = require("./sellerInfo");
 exports.locationSync = require("./locationSync");
 
-const algoliasearch = require("algoliasearch");
+const { algoliasearch } = require("algoliasearch");
 const { defineString } = require("firebase-functions/params");
 
-const ALGOLIA_APP_ID  = defineString("ALGOLIA_APP_ID");
+const ALGOLIA_APP_ID = defineString("ALGOLIA_APP_ID");
 const ALGOLIA_API_KEY = defineString("ALGOLIA_API_KEY");
-const ALGOLIA_INDEX   = "marketplace_products";
+const ALGOLIA_INDEX = "marketplace_products";
 
 exports.syncProductToAlgolia = onDocumentWritten(
-    "marketplaceProducts/{productId}",
-    async (event) => {
-        const productId = event.params.productId;
-        const after  = event.data?.after;
-        const before = event.data?.before;
+  {
+    document: "marketplaceProducts/{productId}",
+    region: "us-central1",
+  },
+  async (event) => {
+    try {
+      const productId = event.params.productId;
+      const after = event.data?.after;
 
-        const algoliaClient = algoliasearch(
-            ALGOLIA_APP_ID.value(),
-            ALGOLIA_API_KEY.value()
-        );
-        const algoliaIndex = algoliaClient.initIndex(ALGOLIA_INDEX);
+      const client = algoliasearch(
+        ALGOLIA_APP_ID.value(),
+        ALGOLIA_API_KEY.value()
+      );
 
-        // Deleted — remove from Algolia index
-        if (!after?.exists) {
-            await algoliaIndex.deleteObject(productId);
-            return;
-        }
+      // ❌ DELETE
+      if (!after?.exists) {
+        await client.deleteObject({
+          indexName: ALGOLIA_INDEX,
+          objectID: productId,
+        });
+        return;
+      }
 
-        const data = after.data();
+      const data = after.data();
 
-        const record = {
-            objectID:       productId,
-            name:           data.name           || "",
-            description:    data.description    || "",
-            categoryId:     data.categoryId     || "",
-            department:     data.department     || "",
-            businessName:   data.businessName   || "",
-            businessType:   data.businessType   || "",
-            sellerId:       data.sellerId       || "",
-            sellingPrice:   data.sellingPrice   || 0,
-            currencySymbol: data.currencySymbol || "",
-            image:          data.image          || "",
-            image2:         data.image2         || "",
-            quantity:       data.quantity       || 0,
-            sold:           data.sold           || 0,
-            address:        data.address        || "",
-            country:        data.country        || "",
-            phone:          data.phone          || "",
-            whatsappLink:   data.whatsappLink   || "",
-            location:       data.location       || null,
-            updatedAt:      data.updatedAt?.toMillis?.() || Date.now(),
-        };
+      if (!data.name) return;
 
-        await algoliaIndex.saveObject(record);
+      // ✅ SAVE
+      await client.saveObject({
+        indexName: ALGOLIA_INDEX,
+        body: {
+          objectID: productId,
+          name: data.name || "",
+          description: data.description || "",
+          categoryId: data.categoryId || "",
+          department: data.department || "",
+          businessName: data.businessName || "",
+          businessType: data.businessType || "",
+          sellerId: data.sellerId || "",
+          sellingPrice: data.sellingPrice || 0,
+          currencySymbol: data.currencySymbol || "",
+          image: data.image || "",
+          image2: data.image2 || "",
+          quantity: data.quantity || 0,
+          sold: data.sold || 0,
+          address: data.address || "",
+          country: data.country || "",
+          phone: data.phone || "",
+          whatsappLink: data.whatsappLink || "",
+          location: data.location || null,
+          updatedAt: data.updatedAt?.toMillis?.() || Date.now(),
+        },
+      });
+
+      console.log("✅ Synced to Algolia:", productId);
+
+    } catch (error) {
+      console.error("❌ Algolia sync failed:", error);
     }
+  }
 );

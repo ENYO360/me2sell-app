@@ -211,11 +211,7 @@ export default function Products() {
     if (editingProduct) {
       productId = editingProduct.id;
     } else {
-      const ref = await addDoc(
-        collection(db, "products", user.uid, "productList"),
-        { createdAt: serverTimestamp() }
-      );
-      productId = ref.id;
+      productId = doc(collection(db, "products", user.uid, "productList")).id;
     }
 
     const imageUrl =
@@ -249,7 +245,7 @@ export default function Products() {
       { merge: true }
     );
 
-    await stampProductVersion();
+    await stampProductVersion(user.uid);
 
     setSaving(false);
     setUploading(false);
@@ -376,23 +372,21 @@ export default function Products() {
         {/* ── STOCK FILTER TABS ── */}
         <div className="flex gap-2 flex-wrap">
           {[
-            { key: "all",  label: "All",          count: allCount,  activeClass: "bg-blue-500 text-white shadow-blue-500/20" },
-            { key: "low",  label: "Low Stock",     count: lowCount,  activeClass: "bg-amber-500 text-white shadow-amber-500/20" },
-            { key: "out",  label: "Out of Stock",  count: outCount,  activeClass: "bg-red-500 text-white shadow-red-500/20"    },
+            { key: "all", label: "All", count: allCount, activeClass: "bg-blue-500 text-white shadow-blue-500/20" },
+            { key: "low", label: "Low Stock", count: lowCount, activeClass: "bg-amber-500 text-white shadow-amber-500/20" },
+            { key: "out", label: "Out of Stock", count: outCount, activeClass: "bg-red-500 text-white shadow-red-500/20" },
           ].map(({ key, label, count, activeClass }) => (
             <button
               key={key}
               onClick={() => setStockFilter(key)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm ${
-                stockFilter === key
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm ${stockFilter === key
                   ? `${activeClass} shadow-lg`
                   : "bg-white border border-gray-200 text-gray-500 hover:border-blue-500/30 hover:text-blue-500"
-              }`}
+                }`}
             >
               {label}
-              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[11px] font-bold ${
-                stockFilter === key ? "bg-white/20" : "bg-gray-100 text-gray-500"
-              }`}>
+              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[11px] font-bold ${stockFilter === key ? "bg-white/20" : "bg-gray-100 text-gray-500"
+                }`}>
                 {count}
               </span>
             </button>
@@ -415,7 +409,7 @@ export default function Products() {
                 <div className="col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-24 space-y-3">
                   <div className="w-16 h-16 rounded-2xl bg-blue-500/6 flex items-center justify-center">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#03165A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.4">
-                      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
                     </svg>
                   </div>
                   <p className="text-gray-400 font-semibold text-sm">No products found</p>
@@ -444,11 +438,10 @@ export default function Products() {
                     }`}
                 >
                   {/* Top accent */}
-                  <div className={`h-1 w-full ${
-                    isOut      ? "bg-red-400"
-                    : isLowStock ? "bg-amber-400"
-                    : "bg-gradient-to-r from-blue-500 to-green-500"
-                  }`} />
+                  <div className={`h-1 w-full ${isOut ? "bg-red-400"
+                      : isLowStock ? "bg-amber-400"
+                        : "bg-gradient-to-r from-blue-500 to-green-500"
+                    }`} />
 
                   <div className="p-4 space-y-3">
 
@@ -485,7 +478,7 @@ export default function Products() {
                         {openMenuId === p.id && (
                           <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: -4 }}
-                            animate={{ opacity: 1, scale: 1,   y: 0  }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
                             transition={{ duration: 0.13 }}
                             className="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-20"
                           >
@@ -539,9 +532,8 @@ export default function Products() {
                     <div className="grid grid-cols-2 gap-2">
                       <div className="bg-gray-50 rounded-xl px-3 py-2">
                         <p className="text-[10px] text-gray-400 uppercase tracking-wider">Qty</p>
-                        <p className={`text-sm font-bold mt-0.5 ${
-                          isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-800"
-                        }`}>
+                        <p className={`text-sm font-bold mt-0.5 ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-800"
+                          }`}>
                           {p.quantity}
                         </p>
                       </div>
@@ -579,8 +571,8 @@ export default function Products() {
             >
               <motion.div
                 initial={{ scale: 0.94, opacity: 0, y: 24 }}
-                animate={{ scale: 1,    opacity: 1, y: 0  }}
-                exit={{    scale: 0.94, opacity: 0, y: 24 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.94, opacity: 0, y: 24 }}
                 transition={{ type: "spring", stiffness: 380, damping: 28 }}
                 onClick={(e) => e.stopPropagation()}
                 className="relative w-full sm:max-w-md bg-white sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col"
@@ -608,7 +600,7 @@ export default function Products() {
                     className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 transition"
                   >
                     <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                      <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                   </button>
                 </div>
@@ -687,9 +679,8 @@ export default function Products() {
                   {form.costPrice && form.sellingPrice && (
                     <div className="flex items-center justify-between px-4 py-2.5 bg-blue-500/[0.04] rounded-xl border border-blue-500/10">
                       <p className="text-xs text-gray-500 font-medium">Profit / Margin</p>
-                      <p className={`text-sm font-bold ${
-                        Number(form.sellingPrice) >= Number(form.costPrice) ? "text-green-600" : "text-red-500"
-                      }`}>
+                      <p className={`text-sm font-bold ${Number(form.sellingPrice) >= Number(form.costPrice) ? "text-green-600" : "text-red-500"
+                        }`}>
                         {currency.symbol}{(Number(form.sellingPrice) - Number(form.costPrice)).toLocaleString()}
                         {Number(form.costPrice) > 0 && (
                           <span className="ml-1 text-xs opacity-70">
@@ -752,7 +743,7 @@ export default function Products() {
 
                   {/* Images */}
                   {[
-                    { label: "Product Image 1", field: "image"  },
+                    { label: "Product Image 1", field: "image" },
                     { label: "Product Image 2", field: "image2" },
                   ].map(({ label, field }) => (
                     <div key={field} className="space-y-1.5">
@@ -763,7 +754,7 @@ export default function Products() {
                         )}
                         <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-500/30 hover:bg-blue-500/[0.02] transition text-sm text-gray-400 font-medium">
                           <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" className="text-gray-300">
-                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"/>
+                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                           </svg>
                           {form[field] && typeof form[field] !== "string" ? "Change image" : "Upload image"}
                           <input
@@ -786,12 +777,10 @@ export default function Products() {
                         onChange={(e) => setForm({ ...form, pushToMarketplace: e.target.checked })}
                         className="sr-only"
                       />
-                      <div className={`w-11 h-6 rounded-full transition-colors duration-200 ${
-                        form.pushToMarketplace ? "bg-blue-500" : "bg-gray-300"
-                      }`}>
-                        <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${
-                          form.pushToMarketplace ? "translate-x-5" : "translate-x-0"
-                        }`} />
+                      <div className={`w-11 h-6 rounded-full transition-colors duration-200 ${form.pushToMarketplace ? "bg-blue-500" : "bg-gray-300"
+                        }`}>
+                        <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${form.pushToMarketplace ? "translate-x-5" : "translate-x-0"
+                          }`} />
                       </div>
                     </div>
                     <div>
@@ -832,7 +821,7 @@ export default function Products() {
                     ) : (
                       <>
                         <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         {editingProduct ? "Save Changes" : "Add Product"}
                       </>

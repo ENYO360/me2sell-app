@@ -342,8 +342,14 @@ function ProductModal({ product, similarProducts, sellerProducts, cart, onAddToC
 
                         <div className="grid grid-cols-2 gap-2 text-sm">
                             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
-                                <p className="text-gray-400 text-xs">In Stock</p>
-                                <p className="font-semibold text-gray-800 dark:text-white mt-0.5">{product.quantity}</p>
+                                {product.quantity > 0 ? (
+                                    <div>
+                                        <p className="text-gray-400 text-xs">In Stock</p>
+                                        <p className="font-semibold text-gray-800 dark:text-white mt-0.5">{product.quantity}</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-red-700 font-semibold">Out of Stock</p>
+                                )}
                             </div>
                             {product.location?.city && (
                                 <div className="col-span-2 bg-gray-50 dark:bg-gray-800 rounded-xl p-3 flex items-center gap-2">
