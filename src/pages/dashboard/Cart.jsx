@@ -78,7 +78,7 @@ export default function Cart() {
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 200 }}
                       className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold 
-                      px-3 py-1 z-30 rounded-full shadow animate-pulse"
+                      px-3 py-1 z-20 rounded-full shadow animate-pulse"
                     >
                       Low Stock ({product.quantity})
                     </motion.div>
@@ -91,13 +91,13 @@ export default function Cart() {
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ duration: 0.3 }}
                       className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold 
-                      px-3 py-1 z-30 rounded-full shadow"
+                      px-3 py-1 z-20 rounded-full shadow"
                     >
                       Out of Stock
                     </motion.div>
                   )}
 
-                  {/* 🖼️ PRODUCT IMAGE */}
+                  {/* PRODUCT IMAGE */}
                   <div className="">
                     <ProductImageCarousel
                       images={[

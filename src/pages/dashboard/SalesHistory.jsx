@@ -135,7 +135,7 @@ const Receipt = React.forwardRef(({ sale, currency, profile, logoSrc }, ref) => 
       <div style={{ fontSize: "11px", marginBottom: "12px" }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span style={{ color: "#555" }}>Receipt #:</span>
-          <span style={{ fontWeight: "700" }}>{sale.id?.toUpperCase()}</span>
+          <span style={{ fontWeight: "700" }}>{sale.id}</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
           <span style={{ color: "#555" }}>Date:</span>
@@ -863,7 +863,7 @@ export default function SalesHistory() {
                                       <span className="text-gray-500 dark:text-gray-400">Sale ID:</span>
                                       <span className="font-mono font-bold text-blue-700 dark:text-blue-300
                                                        bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded">
-                                        {(sale.saleId || sale.id)?.toUpperCase()}
+                                        {(sale.saleId || sale.id)}
                                       </span>
                                     </div>
 
