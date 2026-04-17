@@ -250,11 +250,147 @@ function ProductCard({ product, imageIndex, onSelect, onAddToCart, inCart }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────
+   SHARE SHEET
+───────────────────────────────────────────────────────────────── */
+function ShareSheet({ product, onClose }) {
+    const [copied, setCopied] = useState(false);
+
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+    const shareText = `Check out ${product.name} for ${product.currencySymbol}${product.sellingPrice?.toLocaleString()} on Me2Sell!`;
+
+    const platforms = [
+        {
+            label: "WhatsApp",
+            icon: <FaWhatsapp size={18} />,
+            color: "#25D366",
+            href: `https://wa.me/?text=${encodeURIComponent(shareText + "\n" + shareUrl)}`,
+        },
+        {
+            label: "Facebook",
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+            ),
+            color: "#1877F2",
+            href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+        },
+        {
+            label: "X / Twitter",
+            icon: (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.736-8.856L1.254 2.25H8.08l4.253 5.622 5.912-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            ),
+            color: "#000000",
+            href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+        },
+        {
+            label: "SMS",
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+            ),
+            color: "#5856D6",
+            href: `sms:?body=${encodeURIComponent(shareText + "\n" + shareUrl)}`,
+        },
+    ];
+
+    const copyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            /* fallback: select from input */
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 60, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 320, damping: 28 }}
+                onClick={e => e.stopPropagation()}
+                className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-2xl"
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-base">Share Product</h3>
+                    <button onClick={onClose}
+                        className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition">
+                        <FaTimes size={14} className="text-gray-500" />
+                    </button>
+                </div>
+
+                {/* Product preview */}
+                <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl mb-4">
+                    {product.image
+                        ? <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-lg shrink-0" />
+                        : <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center shrink-0">
+                            <FaBox className="text-gray-400" size={18} />
+                        </div>
+                    }
+                    <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 dark:text-white line-clamp-1">{product.name}</p>
+                        <p className="text-green-600 font-bold text-sm">{product.currencySymbol}{product.sellingPrice?.toLocaleString()}</p>
+                    </div>
+                </div>
+
+                {/* Platform buttons */}
+                <div className="grid grid-cols-4 gap-2 mb-4">
+                    {platforms.map(p => (
+                        <a
+                            key={p.label}
+                            href={p.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                        >
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+                                style={{ background: p.color }}>
+                                {p.icon}
+                            </div>
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">{p.label}</span>
+                        </a>
+                    ))}
+                </div>
+
+                {/* Copy link */}
+                <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                    <p className="flex-1 text-xs text-gray-500 dark:text-gray-400 truncate">{shareUrl}</p>
+                    <button
+                        onClick={copyLink}
+                        className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition
+                            ${copied
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-600 hover:text-white"
+                            }`}
+                    >
+                        {copied ? "Copied ✓" : "Copy"}
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
+/* ─────────────────────────────────────────────────────────────────
    PRODUCT DETAIL MODAL
 ───────────────────────────────────────────────────────────────── */
 function ProductModal({ product, similarProducts, sellerProducts, cart, onAddToCart, onClose, onSelect }) {
     const inCart = cart.some(i => i.id === product.id);
     const modalScrollRef = useRef(null);
+    const [showShare, setShowShare] = useState(false);
 
     useEffect(() => {
         modalScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -391,6 +527,35 @@ function ProductModal({ product, similarProducts, sellerProducts, cart, onAddToC
                             <FaShoppingCart size={14} />
                             {inCart ? "Added to Cart ✓" : "Add to Cart"}
                         </button>
+
+                        {/* Share button */}
+                        <button
+                            onClick={() => {
+                                if (navigator.share) {
+                                    navigator.share({
+                                        title: product.name,
+                                        text: `${product.name} — ${product.currencySymbol}${product.sellingPrice?.toLocaleString()}`,
+                                        url: `${window.location.origin}${window.location.pathname}?product=${product.id}`,
+                                    }).catch(() => { });
+                                } else {
+                                    setShowShare(true);
+                                }
+                            }}
+                            className="w-full py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-green-500 hover:text-green-600 transition"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                            </svg>
+                            Share Product
+                        </button>
+
+                        {/* Share sheet */}
+                        <AnimatePresence>
+                            {showShare && (
+                                <ShareSheet product={product} onClose={() => setShowShare(false)} />
+                            )}
+                        </AnimatePresence>
 
                         {/* More from seller */}
                         {sellerProducts.length > 0 && (
