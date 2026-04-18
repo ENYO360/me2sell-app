@@ -17,7 +17,7 @@ import LOgo from "../../images/me2sell-logo.png";
 ───────────────────────────────────────────────────────────────── */
 const CART_KEY = "marketplace_cart_v1";
 const loadCart = () => { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } };
-const saveCart = (items) => { try { localStorage.setItem(CART_KEY, JSON.stringify(items)); } catch {} };
+const saveCart = (items) => { try { localStorage.setItem(CART_KEY, JSON.stringify(items)); } catch { } };
 
 /* ─────────────────────────────────────────────────────────────────
    CART DRAWER
@@ -101,10 +101,10 @@ function ProductCard({ product, imageIndex, onSelect, onAddToCart, inCart }) {
                         alt={product.name}
                         className="w-full h-40 md:h-44 object-cover group-hover:scale-105 transition-transform duration-500"
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}
-                      />
+                    />
                     : <div className="flex w-full h-40 md:h-44 justify-center items-center bg-gray-100 dark:bg-gray-700">
                         <FaBox className="text-[80px] text-gray-300" />
-                      </div>
+                    </div>
                 }
                 {product.sold > 0 && (
                     <div className="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -145,12 +145,145 @@ function ProductCard({ product, imageIndex, onSelect, onAddToCart, inCart }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────
+   SHARE SHEET
+───────────────────────────────────────────────────────────────── */
+function ShareSheet({ title, subtitle, image, shareUrl, onClose }) {
+    const [copied, setCopied] = useState(false);
+
+    const shareText = `Check out ${title} on Me2Sell!`;
+
+    const platforms = [
+        {
+            label: "WhatsApp",
+            icon: <FaWhatsapp size={18} />,
+            color: "#25D366",
+            href: `https://wa.me/?text=${encodeURIComponent(shareText + "\n" + shareUrl)}`,
+        },
+        {
+            label: "Facebook",
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+            ),
+            color: "#1877F2",
+            href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+        },
+        {
+            label: "X / Twitter",
+            icon: (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.736-8.856L1.254 2.25H8.08l4.253 5.622 5.912-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            ),
+            color: "#000000",
+            href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+        },
+        {
+            label: "SMS",
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+            ),
+            color: "#5856D6",
+            href: `sms:?body=${encodeURIComponent(shareText + "\n" + shareUrl)}`,
+        },
+    ];
+
+    const copyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch { }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 60, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 320, damping: 28 }}
+                onClick={e => e.stopPropagation()}
+                className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-2xl"
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-base">Share</h3>
+                    <button onClick={onClose}
+                        className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition">
+                        <FaTimes size={14} className="text-gray-500" />
+                    </button>
+                </div>
+
+                {/* Preview card */}
+                <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl mb-4">
+                    {image
+                        ? <img src={image} alt={title} className="w-12 h-12 object-cover rounded-xl shrink-0" />
+                        : <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center shrink-0">
+                            <span className="text-white font-black text-lg">
+                                {title?.charAt(0).toUpperCase()}
+                            </span>
+                        </div>
+                    }
+                    <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 dark:text-white line-clamp-1">{title}</p>
+                        {subtitle && <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{subtitle}</p>}
+                    </div>
+                </div>
+
+                {/* Platform buttons */}
+                <div className="grid grid-cols-4 gap-2 mb-4">
+                    {platforms.map(p => (
+                        <a
+                            key={p.label}
+                            href={p.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                        >
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+                                style={{ background: p.color }}>
+                                {p.icon}
+                            </div>
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">{p.label}</span>
+                        </a>
+                    ))}
+                </div>
+
+                {/* Copy link */}
+                <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                    <p className="flex-1 text-xs text-gray-500 dark:text-gray-400 truncate">{shareUrl}</p>
+                    <button
+                        onClick={copyLink}
+                        className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition
+                            ${copied
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-600 hover:text-white"
+                            }`}
+                    >
+                        {copied ? "Copied ✓" : "Copy"}
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
+/* ─────────────────────────────────────────────────────────────────
    PRODUCT MODAL
 ───────────────────────────────────────────────────────────────── */
 function ProductModal({ product, storeProducts, cart, onAddToCart, onClose, onSelect }) {
     const inCart = cart.some(i => i.id === product.id);
     const modalScrollRef = useRef(null);
     const [imgIndex, setImgIndex] = useState(0);
+    const [showShare, setShowShare] = useState(false);
     const images = [product.image, product.image2].filter(Boolean);
 
     useEffect(() => {
@@ -202,10 +335,10 @@ function ProductModal({ product, storeProducts, cart, onAddToCart, onClose, onSe
                                             ))}
                                         </div>
                                     )}
-                                  </>
+                                </>
                                 : <div className="flex w-full h-64 md:h-80 justify-center items-center">
                                     <FaBox className="text-[120px] text-gray-300" />
-                                  </div>
+                                </div>
                             }
                         </div>
 
@@ -300,6 +433,39 @@ function ProductModal({ product, storeProducts, cart, onAddToCart, onClose, onSe
                             {inCart ? "Added to Cart ✓" : "Add to Cart"}
                         </button>
 
+                        {/* Share button */}
+                        <button
+                            onClick={() => {
+                                const shareUrl = `${window.location.href.split("?")[0]}?product=${product.id}`;
+                                const shareText = `Check out ${product.name} for ${product.currencySymbol}${product.sellingPrice?.toLocaleString()} on Me2Sell!`;
+                                if (navigator.share) {
+                                    navigator.share({ title: product.name, text: shareText, url: shareUrl }).catch(() => { });
+                                } else {
+                                    setShowShare(true);
+                                }
+                            }}
+                            className="w-full py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-green-500 hover:text-green-600 transition"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                            </svg>
+                            Share Product
+                        </button>
+
+                        {/* Share sheet */}
+                        <AnimatePresence>
+                            {showShare && (
+                                <ShareSheet
+                                    title={product.name}
+                                    subtitle={`${product.currencySymbol}${product.sellingPrice?.toLocaleString()} · ${product.businessName || ""}`}
+                                    image={product.image}
+                                    shareUrl={`${window.location.href.split("?")[0]}?product=${product.id}`}
+                                    onClose={() => setShowShare(false)}
+                                />
+                            )}
+                        </AnimatePresence>
+
                         {/* More from store — mobile */}
                         {storeProducts.length > 0 && (
                             <div className="md:hidden">
@@ -336,21 +502,22 @@ export default function SellerProfile() {
     const { theme, toggleTheme } = useContext(ThemeContext);
 
     const PAGE_SIZE = 20;
-    const LS_KEY    = `seller_products_${sellerId}`;
+    const LS_KEY = `seller_products_${sellerId}`;
 
     // ── State ────────────────────────────────────────────────────
-    const [sellerProducts,  setSellerProducts]  = useState([]);
-    const [seller,          setSeller]          = useState(null);
-    const [loading,         setLoading]         = useState(true);
-    const [loadingMore,     setLoadingMore]     = useState(false);
-    const [hasMore,         setHasMore]         = useState(false);
-    const [lastDoc,         setLastDoc]         = useState(null);
-    const [searchQuery,     setSearchQuery]     = useState("");
+    const [sellerProducts, setSellerProducts] = useState([]);
+    const [seller, setSeller] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(false);
+    const [lastDoc, setLastDoc] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [cart,            setCartState]       = useState(loadCart);
-    const [showCart,        setShowCart]        = useState(false);
-    const [user,            setUser]            = useState(null);
-    const [imageIndexes,    setImageIndexes]    = useState({});
+    const [cart, setCartState] = useState(loadCart);
+    const [showCart, setShowCart] = useState(false);
+    const [user, setUser] = useState(null);
+    const [imageIndexes, setImageIndexes] = useState({});
+    const [showStoreShare, setShowStoreShare] = useState(false);
     const imageTimersRef = useRef({});
 
     const cartCount = cart.length;
@@ -445,6 +612,19 @@ export default function SellerProfile() {
     }, [sellerId, lastDoc, hasMore, loadingMore]);
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+    // ── Deep-link: open product modal from ?product=ID ───────────────
+    useEffect(() => {
+        if (!sellerProducts.length) return;
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get("product");
+        if (!productId) return;
+        const found = sellerProducts.find(p => p.id === productId);
+        if (found) {
+            setSelectedProduct(found);
+            window.history.replaceState({}, "", window.location.pathname);
+        }
+    }, [sellerProducts]);
 
     // ── Search filter (client-side on loaded products) ───────────
     const filteredProducts = useMemo(() => {
@@ -615,6 +795,26 @@ export default function SellerProfile() {
                                         <FaWhatsapp size={13} /> WhatsApp
                                     </a>
                                 )}
+
+                                {/* Share store button */}
+                                <button
+                                    onClick={() => {
+                                        const shareUrl = window.location.href.split("?")[0];
+                                        const shareText = `Check out ${seller.businessName}'s store on Me2Sell!`;
+                                        if (navigator.share) {
+                                            navigator.share({ title: seller.businessName, text: shareText, url: shareUrl }).catch(() => { });
+                                        } else {
+                                            setShowStoreShare(true);
+                                        }
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:border-green-500 hover:text-green-600 dark:hover:border-green-500 dark:hover:text-green-400 transition"
+                                >
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                                    </svg>
+                                    Share
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -705,6 +905,18 @@ export default function SellerProfile() {
                         onAddToCart={addToCart}
                         onClose={() => setSelectedProduct(null)}
                         onSelect={setSelectedProduct}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* ── STORE SHARE SHEET ── */}
+            <AnimatePresence>
+                {showStoreShare && seller && (
+                    <ShareSheet
+                        title={seller.businessName}
+                        subtitle={`${sellerProducts.length} product${sellerProducts.length !== 1 ? "s" : ""}${seller.country ? ` · ${seller.country}` : ""}`}
+                        shareUrl={window.location.href.split("?")[0]}
+                        onClose={() => setShowStoreShare(false)}
                     />
                 )}
             </AnimatePresence>

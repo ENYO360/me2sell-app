@@ -31,14 +31,13 @@ export default function SearchBar() {
 
     setResults(filtered);
 
-    // Suggestions = unique matching product names, capped at 6
+    // Suggestions = unique matching product names
     const names = [];
     const seen = new Set();
     for (const p of products) {
       if (p.name?.toLowerCase().includes(q) && !seen.has(p.name)) {
         seen.add(p.name);
         names.push(p.name);
-        if (names.length === 6) break;
       }
     }
     setSuggestions(names);
@@ -156,7 +155,7 @@ export default function SearchBar() {
               justify-center rounded-full bg-gray-300 hover:bg-gray-400 text-white transition"
           >
             <svg width="7" height="7" viewBox="0 0 10 10" fill="none">
-              <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
         )}
@@ -165,7 +164,8 @@ export default function SearchBar() {
       {/* Suggestions dropdown */}
       {isOpen && (
         <ul className="absolute z-50 w-full bg-white border border-gray-200 border-t-0
-          rounded-b-2xl shadow-lg overflow-hidden">
+            rounded-b-2xl shadow-lg overflow-hidden max-h-72 overflow-y-auto"
+          >
 
           {suggestions.map((name, idx) => (
             <li key={name}>
@@ -182,7 +182,7 @@ export default function SearchBar() {
                 <svg className="text-gray-300 flex-shrink-0" width="12" height="12"
                   viewBox="0 0 20 20" fill="none">
                   <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35"
-                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
                 <span className="truncate">
                   {highlightMatch(name, query)}

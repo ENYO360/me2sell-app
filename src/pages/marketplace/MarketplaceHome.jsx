@@ -668,6 +668,20 @@ export default function BuyerMarketplace({ categories = [] }) {
         return () => unsub();
     }, []);
 
+    // ── Deep-link: open product modal from ?product=ID ───────────────
+    useEffect(() => {
+        if (!products?.length) return;
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get("product");
+        if (!productId) return;
+        const found = products.find(p => p.id === productId);
+        if (found) {
+            setSelectedProduct(found);
+            // Clean the URL without reloading the page
+            window.history.replaceState({}, "", window.location.pathname);
+        }
+    }, [products]);
+
     // ── Persist cart ──────────────────────────────────────────────
     const updateCart = useCallback((next) => {
         setCartState(next);

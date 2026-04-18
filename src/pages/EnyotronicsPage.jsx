@@ -32,7 +32,7 @@ export default function EnyotronicsPage() {
                 <header className="w-full p-4 bg-white dark:bg-gray-800 shadow fixed top-0 left-0 z-20">
                     <div className="max-w-6xl mx-auto flex justify-between items-center">
                         <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2 cursor-pointer">
-                            <img src={EnyotronicsLogo} alt="Enyotronics Logo" className="w-28 h-8 rounded" />
+                            <img src={EnyotronicsLogo} alt="Enyotronics Logo" className="w-28 h-7 rounded" />
                         </motion.div>
                         <Link to="/" className="font-semibold">Me2sell</Link>
                     </div>
