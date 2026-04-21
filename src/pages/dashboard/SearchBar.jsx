@@ -161,7 +161,7 @@ export default function SearchBar() {
         )}
       </div>
 
-      {/* Suggestions dropdown */}
+      {/* Suggestions dropdown */} 
       {isOpen && (
         <ul className="absolute z-50 w-full bg-white border border-gray-200 border-t-0
             rounded-b-2xl shadow-lg overflow-hidden max-h-72 overflow-y-auto"
