@@ -67,8 +67,8 @@ const getDateRange = (range, startDate, endDate) => {
       end = endDate ? new Date(endDate + "T23:59:59.999") : end;
       break;
     default:
-    start = new Date();
-    start.setHours(0, 0, 0, 0);
+      start = new Date();
+      start.setHours(0, 0, 0, 0);
   }
 
   return { start, end };
@@ -78,7 +78,7 @@ const getDateRange = (range, startDate, endDate) => {
    RECEIPT COMPONENT
    Separate component so ref works
 ================================*/
-const Receipt = React.forwardRef(({ sale, currency, profile, logoSrc }, ref) => {
+const Receipt = React.forwardRef(({ sale, currency, profile, customer }, ref) => {
   if (!sale) return null;
 
   const saleDate = sale.createdAt?.toDate
@@ -94,214 +94,187 @@ const Receipt = React.forwardRef(({ sale, currency, profile, logoSrc }, ref) => 
     <div
       ref={ref}
       style={{
-        width: "320px",
+        width: "360px",
         backgroundColor: "#ffffff",
-        fontFamily: "monospace, sans-serif",
-        padding: "24px 20px",
         color: "#111111",
         boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       {/* ---- HEADER ---- */}
-      <div style={{ textAlign: "center", marginBottom: "16px" }}>
-
-        <div style={{ fontSize: "16px", fontWeight: "800", letterSpacing: "2px", textTransform: "uppercase" }}>
-          {profile?.business?.businessName || "My Business"}
+      <div style={{ backgroundColor: "ffffff", padding: "24px 24px 20px", display: "flex", gap: "10px", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div>
+          <div style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "1px", paddingRight: "10px" }}>
+            {profile?.business?.businessName || "My Business"}
+          </div>
+          <div style={{ fontSize: "9px", color: "#8fa8d8", marginTop: "2px" }}>
+            {profile?.business?.businessType || ""}
+          </div>
         </div>
-        <div style={{ fontSize: "11px", color: "#555" }}>
-          {profile?.business?.businessType || ""}
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: "10px", color: "#404040", textTransform: "uppercase", letterSpacing: "1px" }}>Invoice ID.</div>
+          <div style={{ fontSize: "8px", color: "#404040", fontWeight: "600", marginTop: "2px" }}>
+            #{(sale.saleId || sale.id)?.slice(-10).toUpperCase()}
+          </div>
         </div>
-        {profile?.business?.businessAddress && (
-          <div style={{ fontSize: "10px",  marginTop: "2px" }}>
-            {profile.business.businessAddress}
-          </div>
-        )}
-        {profile?.business?.location?.country && (
-          <div style={{ fontSize: "10px" }}>
-            {profile.business.location.country}
-          </div>
-        )}
-        {profile?.admin?.phone?.full && (
-          <div style={{ fontSize: "11px", marginTop: "2px" }}>
-            Tel: {profile.admin.phone.full}
-          </div>
-        )}
       </div>
 
-      {/* ---- DIVIDER ---- */}
-      <div style={{ borderTop: "2px dashed #ccc", margin: "12px 0" }} />
-
-      {/* ---- RECEIPT META ---- */}
-      <div style={{ fontSize: "11px", marginBottom: "12px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#555" }}>Receipt #:</span>
-          <span style={{ fontWeight: "700" }}>{sale.id}</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-          <span style={{ color: "#555" }}>Date:</span>
-          <span>{saleDate.toLocaleDateString()}</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-          <span style={{ color: "#555" }}>Time:</span>
-          <span>{saleDate.toLocaleTimeString()}</span>
-        </div>
-
-        {sale.soldBy && (
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-            <span style={{ color: "#555" }}>Cashier:</span>
-            <span>{sale.staffName || "Admin"}</span>
-          </div>
-        )}
+      {/* ---- RECEIPT TITLE BAR ---- */}
+      <div style={{ backgroundColor: "#ced9fd", padding: "12px 24px" }}>
+        <div style={{ fontSize: "16px", fontWeight: "700", color: "#404040", letterSpacing: "3px" }}>INVOICE</div>
       </div>
 
-      {/* ---- DIVIDER ---- */}
-      <div style={{ borderTop: "2px dashed #ccc", margin: "12px 0" }} />
-
-      {/* ---- ITEMS HEADER ---- */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "10px",
-          fontWeight: "700",
-          textTransform: "uppercase",
-          letterSpacing: "1px",
-          color: "#555",
-          marginBottom: "8px",
-          borderBottom: "2px solid #111",
-        }}
-      >
-        <span style={{ flex: 2 }}>Item</span>
-        <span style={{ flex: 1, textAlign: "center" }}>Qty</span>
-        <span style={{ flex: 1, textAlign: "right" }}>Rate</span>
-        <span style={{ flex: 1, textAlign: "right" }}>Amount</span>
-      </div>
-
-      {/* ---- ITEMS ---- */}
-      {sale.items.map((item, i) => {
-        const price = item.sellingPrice || item.price || 0;
-        const lineTotal = item.quantity * price;
-
-        return (
-          <div
-            key={i}
-            style={{
-              marginBottom: "10px",
-              paddingBottom: "8px",
-              borderBottom: "2px dotted #e0e0e0",
-            }}
-          >
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: "11px",
-                color: "#333",
-                orderBottom: "1px dotted #e0e0e0",
-              }}
-            >
-              <span style={{ flex: 2, fontSize: "12px", fontWeight: "600", }}>{item.name}</span>
-              <span style={{ flex: 1, textAlign: "center" }}>{item.quantity}</span>
-              <span style={{ flex: 1, textAlign: "right" }}>
-                {currency.symbol}{price.toLocaleString()}
-              </span>
-              <span style={{ flex: 1, textAlign: "right", fontWeight: "600" }}>
-                {currency.symbol}{lineTotal.toLocaleString()}
-              </span>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* ---- SUBTOTAL / TOTAL ---- */}
-      <div style={{ borderTop: "2px dashed #ccc", margin: "12px 0 8px" }} />
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "11px",
-          marginBottom: "6px",
-          color: "#555",
-        }}
-      >
-        <span>Subtotal</span>
-        <span>{currency.symbol}{subtotal.toLocaleString()}</span>
-      </div>
-
-      {sale.discount > 0 && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: "11px",
-            marginBottom: "6px",
-            color: "#e53e3e",
-          }}
-        >
-          <span>Discount</span>
-          <span>-{currency.symbol}{sale.discount.toLocaleString()}</span>
-        </div>
-      )}
-
-      <div style={{ borderTop: "2px solid #111", margin: "8px 0" }} />
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "15px",
-          fontWeight: "800",
-          letterSpacing: "0.5px",
-        }}
-      >
-        <span>TOTAL</span>
-        <span>
-          {currency.symbol}{sale.totalAmount?.toLocaleString()}
+      {/* ---- DATE ROW ---- */}
+      <div style={{ padding: "12px 24px", borderBottom: "0.5px solid #e5e7eb" }}>
+        <span style={{ fontSize: "10px", color: "#6b7280" }}>Date: </span>
+        <span style={{ fontSize: "10px", fontWeight: "600", color: "#111" }}>
+          {saleDate.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}
+        </span>
+        <span style={{ fontSize: "10px", color: "#6b7280", marginLeft: "16px" }}>Time: </span>
+        <span style={{ fontSize: "10px", fontWeight: "600", color: "#111" }}>
+          {saleDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </span>
       </div>
 
-      {/* ---- PAYMENT METHOD ---- */}
-      {sale.paymentMethod && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: "11px",
-            marginTop: "8px",
-            color: "#555",
-          }}
-        >
-          <span>Payment:</span>
-          <span style={{ textTransform: "capitalize" }}>{sale.paymentMethod}</span>
+      {/* ---- BILLED TO / FROM ---- */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "0.5px solid #e5e7eb" }}>
+        {/* Billed To */}
+        <div style={{ padding: "14px 24px", borderRight: "0.5px solid #e5e7eb" }}>
+          <div style={{ fontSize: "10px", fontWeight: "700", color: "#03165A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+            Billed to
+          </div>
+          <div style={{ fontSize: "10px", fontWeight: "400", color: "#111" }}>
+            {customer?.name || "Customer"}
+          </div>
+          {customer?.phone && (
+            <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "2px" }}>
+              {customer.phone}
+            </div>
+          )}
         </div>
-      )}
-
-      {/* ---- DIVIDER ---- */}
-      <div style={{ borderTop: "2px dashed #ccc", margin: "16px 0 12px" }} />
-
-      {/* ---- FOOTER ---- */}
-      <div style={{ textAlign: "center", fontSize: "11px", color: "#555" }}>
-        <div style={{ marginBottom: "4px" }}>Thank you for your patronage! 🙏</div>
-        <div style={{ marginBottom: "8px", fontStyle: "italic" }}>
-          Items sold are not returnable.
+        {/* From */}
+        <div style={{ padding: "14px 24px" }}>
+          <div style={{ fontSize: "10px", fontWeight: "700", color: "#03165A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+            From
+          </div>
+          <div style={{ fontSize: "10px", fontWeight: "400", color: "#111" }}>
+            {profile?.business?.businessName || "My Business"}
+          </div>
+          {profile?.business?.businessAddress && (
+            <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "2px" }}>
+              {profile.business.businessAddress}
+            </div>
+          )}
+          {profile?.admin?.phone?.full && (
+            <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "2px" }}>
+              Tel: {profile.admin.phone.full}
+            </div>
+          )}
         </div>
-        <div
-          style={{
-            fontSize: "9px",
-            color: "#999",
-            borderTop: "1px solid #eee",
-            paddingTop: "8px",
-          }}
-        >
-          Powered by
-          <img
-            src={Logo}
-            alt="Enyotronics"
-            style={{ width: "60px", display: "block", margin: "4px auto 0" }}
-            crossOrigin="anonymous"
-          />
+      </div>
+
+      {/* ---- ITEMS TABLE ---- */}
+      <div style={{ padding: "0 24px" }}>
+        {/* Table Header */}
+        <div style={{
+          display: "flex", justifyContent: "space-between",
+          fontSize: "10px", fontWeight: "700", textTransform: "uppercase",
+          letterSpacing: "0.8px", color: "#03165A",
+          borderBottom: "1.5px solid #03165A",
+          padding: "12px 0 8px",
+        }}>
+          <span style={{ flex: 2 }}>Item</span>
+          <span style={{ flex: 1, textAlign: "center" }}>Qty</span>
+          <span style={{ flex: 1, textAlign: "right" }}>Rate</span>
+          <span style={{ flex: 1, textAlign: "right" }}>Amount</span>
+        </div>
+
+        {/* Table Rows */}
+        {sale.items.map((item, i) => {
+          const price = item.sellingPrice || item.price || 0;
+          const lineTotal = item.quantity * price;
+          return (
+            <div key={i} style={{
+              display: "flex", justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "12px", color: "#333",
+              padding: "9px 0",
+              borderBottom: "0.5px solid #f0f0f0",
+            }}>
+              <span style={{ flex: 2, fontWeight: "600", fontSize: "13px" }}>{item.name}</span>
+              <span style={{ flex: 1, textAlign: "center", color: "#6b7280" }}>{item.quantity}</span>
+              <span style={{ flex: 1, textAlign: "right", color: "#6b7280" }}>{currency.symbol}{price.toLocaleString()}</span>
+              <span style={{ flex: 1, textAlign: "right", fontWeight: "600" }}>{currency.symbol}{lineTotal.toLocaleString()}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ---- TOTALS ---- */}
+      <div style={{ padding: "0 24px" }}>
+        {/* Subtotal */}
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#6b7280", padding: "10px 0 4px" }}>
+          <span>Subtotal</span>
+          <span>{currency.symbol}{subtotal.toLocaleString()}</span>
+        </div>
+
+        {sale.discount > 0 && (
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#e53e3e", paddingBottom: "4px" }}>
+            <span>Discount</span>
+            <span>-{currency.symbol}{sale.discount.toLocaleString()}</span>
+          </div>
+        )}
+
+        {/* Total */}
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "baseline",
+          borderTop: "1.5px solid #03165A",
+          padding: "12px 0 14px",
+          gap: "40px",
+        }}>
+          <span style={{ fontSize: "11px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "1px" }}>Total</span>
+          <span style={{ fontSize: "20px", fontWeight: "700", color: "#03165A" }}>
+            {currency.symbol}{sale.totalAmount?.toLocaleString()}
+          </span>
+        </div>
+      </div>
+
+      {/* ---- META ROW ---- */}
+      <div style={{ display: "flex", gap: "24px", padding: "10px 24px 14px", borderTop: "0.5px solid #e5e7eb" }}>
+        {sale.paymentMethod && (
+          <div style={{ fontSize: "12px", color: "#6b7280" }}>
+            Payment: <span style={{ color: "#111", fontWeight: "600", textTransform: "capitalize" }}>{sale.paymentMethod}</span>
+          </div>
+        )}
+        {(sale.staffName || sale.soldBy) && (
+          <div style={{ fontSize: "12px", color: "#6b7280" }}>
+            Cashier: <span style={{ color: "#111", fontWeight: "600" }}>{sale.staffName || "Admin"}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ---- FOOTER NOTE ---- */}
+      <div style={{ textAlign: "center", fontSize: "11px", color: "#6b7280", padding: "8px 24px 0", fontStyle: "italic" }}>
+        Thank you for your patronage — items sold are not returnable.
+      </div>
+
+      {/* ---- WAVE FOOTER ---- */}
+      <div style={{ marginTop: "16px", position: "relative", height: "52px", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0,
+          height: "70px", backgroundColor: "#03165A",
+          borderRadius: "60% 60% 0 0 / 100% 100% 0 0",
+        }} />
+        <div style={{
+          position: "absolute", bottom: 0, right: 0,
+          width: "45%", height: "60px", backgroundColor: "#4a5568",
+          borderRadius: "60% 0 0 0 / 100% 0 0 0",
+        }} />
+        <div style={{
+          position: "absolute", display: "flex", justifyContent: "center", bottom: "8px", left: 0, right: 0,
+          textAlign: "center", fontSize: "10px", color: "#8fa8d8", zIndex: 1,
+        }}>
+          Powered by: <img src={Logo} alt="me2sell" style={{ display: "inline-block", height: "14px", marginBottom: "-2px" }} />
         </div>
       </div>
     </div>
@@ -310,10 +283,83 @@ const Receipt = React.forwardRef(({ sale, currency, profile, logoSrc }, ref) => 
 
 Receipt.displayName = "Receipt";
 
+// Customer Info Modal — collects optional customer details before showing receipt
+function CustomerInfoModal({ onConfirm, onClose }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const handleSubmit = () => {
+    onConfirm({ name: name.trim(), phone: phone.trim() });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.92, y: 20 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div>
+            <h3 className="text-base font-bold text-gray-900">Customer Details</h3>
+            <p className="text-xs text-gray-500 mt-0.5">For the receipt, both fields are optional</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition">
+            <FaTimes className="text-gray-500" />
+          </button>
+        </div>
+
+        {/* Fields */}
+        <div className="px-5 py-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Customer Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. John Doe"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#03165A]/30 focus:border-[#03165A]"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Phone Number</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. +234 800 000 0000"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#03165A]/30 focus:border-[#03165A]"
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="px-5 pb-5 space-y-2">
+          <button
+            onClick={handleSubmit}
+            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-900 text-white text-sm font-semibold transition"
+          >
+            Continue to Receipt
+          </button>
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 rounded-xl text-sm text-gray-500 hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 /* ===============================
    RECEIPT MODAL COMPONENT
 ================================*/
-function ReceiptModal({ sale, currency, profile, logoSrc, onClose }) {
+function ReceiptModal({ sale, currency, profile, logoSrc, onClose, customer }) {
   const receiptRef = useRef(null);
   const [sharing, setSharing] = useState(false);
   const [printing, setPrinting] = useState(false);
@@ -501,6 +547,7 @@ function ReceiptModal({ sale, currency, profile, logoSrc, onClose }) {
                 currency={currency}
                 profile={profile}
                 logoSrc={logoSrc}
+                customer={customer}
               />
             </div>
           </div>
@@ -512,10 +559,10 @@ function ReceiptModal({ sale, currency, profile, logoSrc, onClose }) {
               onClick={handleShareImage}
               disabled={sharing}
               className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl font-semibold text-sm transition ${shareSuccess
-                  ? "bg-green-500 text-white"
-                  : sharing
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700 text-white shadow-sm shadow-green-200"
+                ? "bg-green-500 text-white"
+                : sharing
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700 text-white shadow-sm shadow-green-200"
                 }`}
             >
               {sharing ? (
@@ -538,8 +585,8 @@ function ReceiptModal({ sale, currency, profile, logoSrc, onClose }) {
               onClick={handlePrintPDF}
               disabled={printing}
               className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl font-semibold text-sm transition ${printing
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-200"
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-200"
                 }`}
             >
               {printing ? (
@@ -571,7 +618,7 @@ function ReceiptModal({ sale, currency, profile, logoSrc, onClose }) {
 // ── Shared product card (search results) ─────────────────────────────────────
 function ProductCard({ product, currency, addToCart, startSale, lowStockThreshold }) {
   const isLowStock = product.quantity > 0 && product.quantity <= lowStockThreshold;
-  const isOut      = product.quantity === 0;
+  const isOut = product.quantity === 0;
 
   return (
     <motion.div
@@ -634,8 +681,10 @@ export default function SalesHistory() {
   const [hasMore, setHasMore] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
 
-  // 🔥 Receipt modal state
-  const [receiptSale, setReceiptSale] = useState(null);
+  // Receipt modal state
+  const [pendingSale, setPendingSale] = useState(null); // waiting for customer info
+  const [receiptSale, setReceiptSale] = useState(null); // ready to show receipt
+  const [customer, setCustomer] = useState(null); // { name, phone }
 
   const [filters, setFilters] = useState({
     range: "today",
@@ -732,26 +781,26 @@ export default function SalesHistory() {
     if (user) fetchSales(user.uid, true);
   };
 
-    // ── Search results view ─────────────────────────────────────────────────────
-    if (results.length > 0) {
-      return (
-        <DashboardLayout>
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-2xl font-bold text-[#03165A]">Search Results</h2>
-              <p className="text-sm text-gray-400 mt-0.5">{results.length} product{results.length !== 1 ? "s" : ""} found</p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {results.map((p) => (
-                <ProductCard key={p.id} product={p} currency={currency}
-                  addToCart={addToCart} startSale={startSale} lowStockThreshold={lowStockThreshold} />
-              ))}
-            </div>
+  // ── Search results view ─────────────────────────────────────────────────────
+  if (results.length > 0) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-bold text-[#03165A]">Search Results</h2>
+            <p className="text-sm text-gray-400 mt-0.5">{results.length} product{results.length !== 1 ? "s" : ""} found</p>
           </div>
-          <SaleModal />
-        </DashboardLayout>
-      );
-    }
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {results.map((p) => (
+              <ProductCard key={p.id} product={p} currency={currency}
+                addToCart={addToCart} startSale={startSale} lowStockThreshold={lowStockThreshold} />
+            ))}
+          </div>
+        </div>
+        <SaleModal />
+      </DashboardLayout>
+    );
+  }
 
   const searchActive = results.length > 0;
   const displayList = searchActive ? results : products;
@@ -759,193 +808,205 @@ export default function SalesHistory() {
   return (
     <DashboardLayout>
       <div className="md:p-6 mb-12">
-          <>
-            {/* ========== FILTERS ========== */}
-            <div className="flex flex-col gap-4 mb-6">
-              <h2 className="text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                Sales History
-              </h2>
+        <>
+          {/* ========== FILTERS ========== */}
+          <div className="flex flex-col gap-4 mb-6">
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-200">
+              Sales History
+            </h2>
 
-              <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border dark:border-slate-700">
-                {["today", "week", "month"].map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => setFilters({ range: r, startDate: "", endDate: "" })}
-                    className={`px-3 py-1.5 text-xs md:text-sm rounded-md font-medium transition ${filters.range === r
-                        ? "bg-blue-600 text-white shadow"
-                        : "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600"
-                      }`}
-                  >
-                    {r === "today" ? "Today" : r === "week" ? "This Week" : r === "month" ? "This Month" : "All"}
-                  </button>
-                ))}
+            <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border dark:border-slate-700">
+              {["today", "week", "month"].map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setFilters({ range: r, startDate: "", endDate: "" })}
+                  className={`px-3 py-1.5 text-xs md:text-sm rounded-md font-medium transition ${filters.range === r
+                    ? "bg-blue-600 text-white shadow"
+                    : "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600"
+                    }`}
+                >
+                  {r === "today" ? "Today" : r === "week" ? "This Week" : r === "month" ? "This Month" : "All"}
+                </button>
+              ))}
 
-                <div className="hidden md:block h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2" />
-                <FaCalendarAlt className="text-gray-500 text-sm md:text-base" />
+              <div className="hidden md:block h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2" />
+              <FaCalendarAlt className="text-gray-500 text-sm md:text-base" />
 
-                <input
-                  type="date"
-                  value={filters.startDate}
-                  onChange={(e) => setFilters({ ...filters, range: "custom", startDate: e.target.value })}
-                  className="border dark:border-slate-600 bg-gray-50 dark:bg-slate-700 px-2 py-1 rounded-md text-xs md:text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-xs md:text-sm text-gray-500">to</span>
-                <input
-                  type="date"
-                  value={filters.endDate}
-                  onChange={(e) => setFilters({ ...filters, range: "custom", endDate: e.target.value })}
-                  className="border dark:border-slate-600 bg-gray-50 dark:bg-slate-700 px-2 py-1 rounded-md text-xs md:text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              <input
+                type="date"
+                value={filters.startDate}
+                onChange={(e) => setFilters({ ...filters, range: "custom", startDate: e.target.value })}
+                className="border dark:border-slate-600 bg-gray-50 dark:bg-slate-700 px-2 py-1 rounded-md text-xs md:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-xs md:text-sm text-gray-500">to</span>
+              <input
+                type="date"
+                value={filters.endDate}
+                onChange={(e) => setFilters({ ...filters, range: "custom", endDate: e.target.value })}
+                className="border dark:border-slate-600 bg-gray-50 dark:bg-slate-700 px-2 py-1 rounded-md text-xs md:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
+          </div>
 
-            {/* ========== TABLE ========== */}
-            {loading ? (
-              <p className="text-center text-sm text-gray-500 mt-10">Loading sales...</p>
-            ) : sales.length === 0 ? (
-              <p className="text-center text-sm text-gray-500 mt-10">No sales found.</p>
-            ) : (
-              <>
-                <div className="overflow-x-auto rounded-xl shadow border dark:border-slate-700">
-                  <table className="w-full bg-white dark:bg-slate-800 text-xs md:text-sm">
-                    <thead className="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 sticky top-0 z-10">
-                      <tr>
-                        <th className="px-3 py-2 text-left font-semibold">Item</th>
-                        <th className="px-3 py-2 text-center font-semibold">Qty</th>
-                        <th className="px-3 py-2 text-center font-semibold">Rate</th>
-                        <th className="px-3 py-2 text-center font-semibold">Total</th>
-                        <th className="px-3 py-2 text-center font-semibold">Date</th>
-                      </tr>
-                    </thead>
+          {/* ========== TABLE ========== */}
+          {loading ? (
+            <p className="text-center text-sm text-gray-500 mt-10">Loading sales...</p>
+          ) : sales.length === 0 ? (
+            <p className="text-center text-sm text-gray-500 mt-10">No sales found.</p>
+          ) : (
+            <>
+              <div className="overflow-x-auto rounded-xl shadow border dark:border-slate-700">
+                <table className="w-full bg-white dark:bg-slate-800 text-xs md:text-sm">
+                  <thead className="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 sticky top-0 z-10">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-semibold">Item</th>
+                      <th className="px-3 py-2 text-center font-semibold">Qty</th>
+                      <th className="px-3 py-2 text-center font-semibold">Rate</th>
+                      <th className="px-3 py-2 text-center font-semibold">Total</th>
+                      <th className="px-3 py-2 text-center font-semibold">Date</th>
+                    </tr>
+                  </thead>
 
-                    <tbody className="divide-y dark:divide-slate-700">
-                      {sales.map((sale) => (
-                        <React.Fragment key={sale.id}>
-                          <tr
-                            onClick={() => setExpandedId(expandedId === sale.id ? null : sale.id)}
-                            className="hover:bg-gray-50 cursor-pointer dark:hover:bg-slate-700 transition"
-                          >
-                            <td className="px-3 py-2 align-top text-gray-800 dark:text-gray-200">
-                              {sale.items.map((i, idx) => (
-                                <div key={idx} className="line-clamp-3 max-w-[120px] md:max-w-none">
-                                  {i.name}
-                                </div>
-                              ))}
-                            </td>
-                            <td className="px-3 py-2 text-center text-gray-600 dark:text-gray-300">
-                              {sale.items.map((i, idx) => <div key={idx}>{i.quantity}</div>)}
-                            </td>
-                            <td className="px-3 py-2 text-center text-gray-700 dark:text-gray-200">
-                              {sale.items.map((i, idx) => (
-                                <div key={idx}>{currency.symbol}{(i.sellingPrice || i.price)?.toLocaleString()}</div>
-                              ))}
-                            </td>
-                            <td className="px-2 py-2 text-center font-semibold text-green-600 dark:text-green-400">
-                              {currency.symbol}{sale.totalAmount?.toLocaleString()}
-                            </td>
-                            <td className="px-3 py-2 text-center text-gray-500 dark:text-gray-400 whitespace-break-spaces">
-                              {sale.createdAt?.toDate
-                                ? sale.createdAt.toDate().toLocaleString()
-                                : new Date(sale.createdAt?.seconds * 1000).toLocaleString()}
-                            </td>
-                          </tr>
+                  <tbody className="divide-y dark:divide-slate-700">
+                    {sales.map((sale) => (
+                      <React.Fragment key={sale.id}>
+                        <tr
+                          onClick={() => setExpandedId(expandedId === sale.id ? null : sale.id)}
+                          className="hover:bg-gray-50 cursor-pointer dark:hover:bg-slate-700 transition"
+                        >
+                          <td className="px-3 py-2 align-top text-gray-800 dark:text-gray-200">
+                            {sale.items.map((i, idx) => (
+                              <div key={idx} className="line-clamp-3 max-w-[120px] md:max-w-none">
+                                {i.name}
+                              </div>
+                            ))}
+                          </td>
+                          <td className="px-3 py-2 text-center text-gray-600 dark:text-gray-300">
+                            {sale.items.map((i, idx) => <div key={idx}>{i.quantity}</div>)}
+                          </td>
+                          <td className="px-3 py-2 text-center text-gray-700 dark:text-gray-200">
+                            {sale.items.map((i, idx) => (
+                              <div key={idx}>{currency.symbol}{(i.sellingPrice || i.price)?.toLocaleString()}</div>
+                            ))}
+                          </td>
+                          <td className="px-2 py-2 text-center font-semibold text-green-600 dark:text-green-400">
+                            {currency.symbol}{sale.totalAmount?.toLocaleString()}
+                          </td>
+                          <td className="px-3 py-2 text-center text-gray-500 dark:text-gray-400 whitespace-break-spaces">
+                            {sale.createdAt?.toDate
+                              ? sale.createdAt.toDate().toLocaleString()
+                              : new Date(sale.createdAt?.seconds * 1000).toLocaleString()}
+                          </td>
+                        </tr>
 
-                          {/* 🔥 EXPANDED ROW */}
-                          {expandedId === sale.id && (
-                            <tr className="bg-blue-50 dark:bg-slate-700">
-                              <td colSpan={5} className="px-4 py-3">
-                                <div className="flex flex-wrap items-center justify-between gap-3">
+                        {/* 🔥 EXPANDED ROW */}
+                        {expandedId === sale.id && (
+                          <tr className="bg-blue-50 dark:bg-slate-700">
+                            <td colSpan={5} className="px-4 py-3">
+                              <div className="flex flex-wrap items-center justify-between gap-3">
 
-                                  {/* ── Sale metadata ── */}
-                                  <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs">
-                                    {/* Sale ID */}
-                                    <div className="flex items-center gap-1.5">
-                                      <span className="text-gray-500 dark:text-gray-400">Sale ID:</span>
-                                      <span className="font-mono font-bold text-blue-700 dark:text-blue-300
+                                {/* ── Sale metadata ── */}
+                                <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs">
+                                  {/* Sale ID */}
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-gray-500 dark:text-gray-400">Sale ID:</span>
+                                    <span className="font-mono font-bold text-blue-700 dark:text-blue-300
                                                        bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded">
-                                        {(sale.saleId || sale.id)}
-                                      </span>
-                                    </div>
-
-                                    {/* Sold by */}
-                                    {sale.staffName ? (
-                                      <div className="flex items-center gap-1.5">
-                                        <span className="text-gray-500 dark:text-gray-400">Sold by:</span>
-                                        <span className="font-semibold text-purple-700 dark:text-purple-300
-                                                         bg-purple-100 dark:bg-purple-900/40 px-2 py-0.5 rounded">
-                                          {sale.staffName}
-                                        </span>
-                                        <span className="text-gray-400 dark:text-gray-500 italic">(Staff)</span>
-                                      </div>
-                                    ) : (
-                                      <div className="flex items-center gap-1.5">
-                                        <span className="text-gray-500 dark:text-gray-400">Sold by:</span>
-                                        <span className="font-semibold text-green-700 dark:text-green-300
-                                                         bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded">
-                                          You (Admin)
-                                        </span>
-                                      </div>
-                                    )}
+                                      {(sale.saleId || sale.id)}
+                                    </span>
                                   </div>
 
-                                  {/* ── Generate Receipt button ── */}
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setReceiptSale(sale);
-                                    }}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-600
+                                  {/* Sold by */}
+                                  {sale.staffName ? (
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-gray-500 dark:text-gray-400">Sold by:</span>
+                                      <span className="font-semibold text-purple-700 dark:text-purple-300
+                                                         bg-purple-100 dark:bg-purple-900/40 px-2 py-0.5 rounded">
+                                        {sale.staffName}
+                                      </span>
+                                      <span className="text-gray-400 dark:text-gray-500 italic">(Staff)</span>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-gray-500 dark:text-gray-400">Sold by:</span>
+                                      <span className="font-semibold text-green-700 dark:text-green-300
+                                                         bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded">
+                                        You (Admin)
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* ── Generate Receipt button ── */}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setPendingSale(sale); }}
+                                  className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-600
                                                border border-blue-200 dark:border-slate-500
                                                text-blue-700 dark:text-blue-300
                                                hover:bg-blue-600 hover:text-white hover:border-blue-600
                                                rounded-lg text-sm font-semibold transition shadow-sm"
-                                  >
-                                    <FaFileAlt className="text-xs" />
-                                    Generate Receipt
-                                  </button>
+                                >
+                                  <FaFileAlt className="text-xs" />
+                                  Generate Receipt
+                                </button>
 
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-                {/* ========== PAGINATION ========== */}
-                <div className="flex justify-center mt-6">
-                  {loadingMore ? (
-                    <button disabled className="bg-gray-400 px-5 py-2 rounded-lg text-white text-sm">
-                      Loading...
-                    </button>
-                  ) : hasMore ? (
-                    <button
-                      onClick={handleLoadMore}
-                      className="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg text-white text-sm shadow transition"
-                    >
-                      Load More
-                    </button>
-                  ) : (
-                    <span className="text-sm text-gray-500">No more sales</span>
-                  )}
-                </div>
-              </>
-            )}
-          </>
+              {/* ========== PAGINATION ========== */}
+              <div className="flex justify-center mt-6">
+                {loadingMore ? (
+                  <button disabled className="bg-gray-400 px-5 py-2 rounded-lg text-white text-sm">
+                    Loading...
+                  </button>
+                ) : hasMore ? (
+                  <button
+                    onClick={handleLoadMore}
+                    className="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg text-white text-sm shadow transition"
+                  >
+                    Load More
+                  </button>
+                ) : (
+                  <span className="text-sm text-gray-500">No more sales</span>
+                )}
+              </div>
+            </>
+          )}
+        </>
 
         <SaleModal />
       </div>
 
-      {/* 🔥 RECEIPT MODAL */}
+      {/* CUSTOMER INFO MODAL — step 1 */}
+      {pendingSale && (
+        <AnimatePresence>
+          <CustomerInfoModal
+            onConfirm={(info) => {
+              setCustomer(info);
+              setReceiptSale(pendingSale);
+              setPendingSale(null);
+            }}
+            onClose={() => setPendingSale(null)}
+          />
+        </AnimatePresence>
+      )}
+
+      {/* RECEIPT MODAL — step 2 */}
       {receiptSale && (
         <ReceiptModal
           sale={receiptSale}
           currency={currency}
           profile={profile}
           logoSrc={Logo}
-          onClose={() => setReceiptSale(null)}
+          customer={customer}
+          onClose={() => { setReceiptSale(null); setCustomer(null); }}
         />
       )}
     </DashboardLayout>

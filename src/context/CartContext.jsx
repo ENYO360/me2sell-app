@@ -233,7 +233,14 @@ export const CartProvider = ({ children }) => {
             const saleId = salesRef.id;
 
             // ✅ Stats go under OWNER's dashboardStats
-            const dailyRef = doc(db, "dashboardStats", ownerId, "daily", todayKey);
+            const adminDailyRef = doc(db, "dashboardStats", ownerId, "daily", todayKey);
+
+            //   Staff stats — only written when seller is a staff member
+            //    Path: staffDashboardStats/{staffUid}/daily/{date}
+            //    Scoped to the individual staff so each staff member has their own stats
+            const staffDailyRef = isStaff
+                ? doc(db, "staffDashboardStats", user.uid, "daily", todayKey)
+                : null;
 
             // Build items with resolved prices
             const items = cartItems.map((item) => {
@@ -321,7 +328,31 @@ export const CartProvider = ({ children }) => {
                     dailyUpdate[`topProducts.${item.productId}.name`] = item.name;
                 });
 
-                tx.set(dailyRef, dailyUpdate, { merge: true });
+                tx.set(adminDailyRef, dailyUpdate, { merge: true });
+
+                //  5. Update STAFF daily stats (only when seller is staff) ──
+                //    Mirrors the same shape as dashboardStats so the same
+                //    dashboard components can consume it without changes.
+                if (isStaff && staffDailyRef) {
+                    const staffDailyUpdate = {
+                        salesCount: increment(totalQuantity),
+                        revenue: increment(totalAmount),
+                        profit: increment(totalProfit),
+                        staffUid: user.uid,
+                        staffName: staffName || "Staff Member",
+                        businessId: ownerId,
+                        updatedAt: serverTimestamp(),
+                    }
+
+                    items.forEach((item) => {
+                        dailyUpdate[`topProducts.${item.productId}.quantity`] = increment(item.quantity);
+                        dailyUpdate[`topProducts.${item.productId}.revenue`] = increment(item.total);
+                        dailyUpdate[`topProducts.${item.productId}.name`] = item.name;
+                    });
+
+                    tx.set(staffDailyRef, staffDailyUpdate, { merge: true });
+
+                }
 
                 // ── 5. Update marketplace sold counts ──
                 items.forEach((item, index) => {

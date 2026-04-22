@@ -22,7 +22,7 @@ export const DirectSaleProvider = ({ children }) => {
     const [isSaleModalOpen, setSaleModalOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
 
-    // ✅ Same owner resolution pattern as CartContext
+    // Same owner resolution pattern as CartContext
     const [user, setUser] = useState(null);
     const [ownerId, setOwnerId] = useState(null);
     const [isStaff, setIsStaff] = useState(false);
@@ -106,6 +106,9 @@ export const DirectSaleProvider = ({ children }) => {
        - staffName   = only present when seller is staff
        - saleId      = document ID stamped on record
        - Stats updated under OWNER's dashboardStats
+       - Stats always updated under OWNER's dashboardStats (admin)
+       - Stats ALSO written to staffDashboardStats/{staffUid}/daily/{date}
+         when the seller is a staff member
     ───────────────────────────────────────── */
     const confirmSale = async (editedPrice) => {
         if (!selectedProduct) return;
@@ -136,7 +139,14 @@ export const DirectSaleProvider = ({ children }) => {
             const marketplaceRef = doc(db, "marketplaceProducts", selectedProduct.id);
 
             // ✅ Stats under owner's dashboardStats
-            const dailyRef = doc(db, "dashboardStats", ownerId, "daily", todayKey);
+            const adminDailyRef = doc(db, "dashboardStats", ownerId, "daily", todayKey);
+
+             //   Staff stats — only written when seller is a staff member
+            //    Path: staffDashboardStats/{staffUid}/daily/{date}
+            //    Scoped to the individual staff so each staff member has their own stats
+            const staffDailyRef = isStaff
+                ? doc(db, "staffDashboardStats", user.uid, "daily", todayKey)
+                : null;
 
             // ✅ Sale recorded under owner's sales collection
             const salesRef = doc(collection(db, "sales", ownerId, "userSales"));
@@ -192,7 +202,7 @@ export const DirectSaleProvider = ({ children }) => {
 
                 // ── 4. Update daily stats (owner's) ──
                 tx.set(
-                    dailyRef,
+                    adminDailyRef,
                     {
                         salesCount: increment(1),
                         revenue: increment(editedPrice),
@@ -205,7 +215,30 @@ export const DirectSaleProvider = ({ children }) => {
                     { merge: true }
                 );
 
-                // ── 5. Update marketplace sold count ──
+                //  5. Update STAFF daily stats (only when seller is staff) ──
+                //    Mirrors the same shape as dashboardStats so the same
+                //    dashboard components can consume it without changes.
+                if (isStaff && staffDailyRef) {
+                    tx.set(
+                        staffDailyRef,
+                        {
+                            salesCount: increment(1),
+                            revenue: increment(editedPrice),
+                            profit: increment(profit),
+                            [`topProducts.${selectedProduct.id}.quantity`]: increment(1),
+                            [`topProducts.${selectedProduct.id}.revenue`]: increment(editedPrice),
+                            [`topProducts.${selectedProduct.id}.name`]: selectedProduct.name,
+                            // ✅ Extra metadata useful for staff-specific queries
+                            staffUid: user.uid,
+                            staffName: staffName || "Staff Member",
+                            businessId: ownerId,
+                            updatedAt: serverTimestamp(),
+                        },
+                        { merge: true }
+                    );
+                }
+
+                // ── 6. Update marketplace sold count ──
                 if (pushToMarketplace) {
                     tx.update(marketplaceRef, {
                         sold: increment(1),
@@ -214,7 +247,7 @@ export const DirectSaleProvider = ({ children }) => {
                 }
             });
 
-            // ── 6. Stamp product version so UI refreshes ──
+            // ── 7. Stamp product version so UI refreshes ──
             await stampProductVersion(ownerId);
 
             setSaleModalOpen(false);

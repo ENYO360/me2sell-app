@@ -98,7 +98,7 @@ export default function StaffProducts() {
                 </div>
 
                 {/* ── Stats ── */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="hidden md:grid grid-cols-3 md:grid-cols-3 gap-4">
                     <StatCard
                         label="Accessible Products"
                         value={products.length}

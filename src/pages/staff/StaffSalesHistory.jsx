@@ -507,10 +507,6 @@ export default function StaffSalesHistory() {
         setFilters(next);
     };
 
-    /* ── Summary stats ── */
-    const totalRevenue = sales.reduce((sum, s) => sum + (s.totalAmount || 0), 0);
-    const totalItems = sales.reduce((sum, s) => sum + (s.totalQuantity || 0), 0);
-
     return (
         <StaffDashboardLayout>
             <div className="space-y-6 mb-16">
@@ -530,26 +526,6 @@ export default function StaffSalesHistory() {
                         <FaReceipt className="text-blue-600 dark:text-blue-400" />
                     </div>
                 </div>
-
-                {/* ── Summary Cards ── */}
-                {!loading && sales.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm
-                                        border border-gray-100 dark:border-gray-700">
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Total Revenue</p>
-                            <p className="text-xl font-black text-green-600 dark:text-green-400 mt-1">
-                                {currency.symbol}{totalRevenue.toLocaleString()}
-                            </p>
-                        </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm
-                                        border border-gray-100 dark:border-gray-700">
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Items Sold</p>
-                            <p className="text-xl font-black text-blue-600 dark:text-blue-400 mt-1">
-                                {totalItems}
-                            </p>
-                        </div>
-                    </div>
-                )}
 
                 {/* ── Filters ── */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm
