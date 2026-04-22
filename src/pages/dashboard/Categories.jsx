@@ -24,9 +24,9 @@ import {
 } from "react-icons/fa";
 
 // ── Shared product card (search + category detail) ────────────────────────────
-function ProductCard({ p, currency, addToCart, startSale, lowStockThreshold }) {
+function ProductCard({ p, currency, addToCart, startSale, lowStockThreshold, adding }) {
   const isLowStock = p.quantity > 0 && p.quantity <= lowStockThreshold;
-  const isOut      = p.quantity === 0;
+  const isOut = p.quantity === 0;
 
   return (
     <motion.div
@@ -67,7 +67,11 @@ function ProductCard({ p, currency, addToCart, startSale, lowStockThreshold }) {
           <div className="flex gap-2">
             <button onClick={() => addToCart(p)}
               className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
-              <FaShoppingCart className="text-[10px]" /> Add
+              {adding === p.id ? (
+                <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
+              ) : (
+                <><FaShoppingCart className="text-[10px]" /> Add</>
+              )}
             </button>
             <button onClick={() => startSale(p)}
               className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
@@ -95,7 +99,7 @@ function Modal({ open, onClose, children }) {
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
       style={{
-        background:     visible ? "rgba(3,22,90,0.45)" : "rgba(3,22,90,0)",
+        background: visible ? "rgba(3,22,90,0.45)" : "rgba(3,22,90,0)",
         backdropFilter: visible ? "blur(8px)" : "blur(0px)",
         transition: "background 0.25s ease, backdrop-filter 0.25s ease",
       }}
@@ -105,8 +109,8 @@ function Modal({ open, onClose, children }) {
         onClick={(e) => e.stopPropagation()}
         className="relative w-full sm:max-w-md bg-white sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl"
         style={{
-          transform:  visible ? "translateY(0) scale(1)"    : "translateY(40px) scale(0.97)",
-          opacity:    visible ? 1 : 0,
+          transform: visible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.97)",
+          opacity: visible ? 1 : 0,
           transition: "transform 0.32s cubic-bezier(0.34,1.56,0.64,1), opacity 0.22s ease",
         }}
       >
@@ -122,28 +126,28 @@ function Modal({ open, onClose, children }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function Categories() {
-  const [categories, setCategories]           = useState([]);
-  const [activeCategory, setActiveCategory]   = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showEditModal, setShowEditModal]     = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [initialEditData, setInitialEditData] = useState(null);
-  const [saving, setSaving]                   = useState(false);
-  const [newCategory, setNewCategory]         = useState({ name: "", description: "" });
-  const [editData, setEditData]               = useState({ name: "", description: "" });
+  const [saving, setSaving] = useState(false);
+  const [newCategory, setNewCategory] = useState({ name: "", description: "" });
+  const [editData, setEditData] = useState({ name: "", description: "" });
 
-  const { addToCart }                                             = useCart();
-  const { setScope, results }                                     = useSearch();
-  const { startSale }                                             = useDirectSale();
-  const { notify }                                                = useNotification();
-  const { openConfirm }                                           = useConfirmModal();
-  const { currency }                                              = useCurrency();
-  const { products, lowStockThreshold }                           = useProducts();
-  const { user }                                                  = useAuth();
+  const { addToCart, adding } = useCart();
+  const { setScope, results } = useSearch();
+  const { startSale } = useDirectSale();
+  const { notify } = useNotification();
+  const { openConfirm } = useConfirmModal();
+  const { currency } = useCurrency();
+  const { products, lowStockThreshold } = useProducts();
+  const { user } = useAuth();
 
   useEffect(() => { setScope("all-products"); }, []);
 
   const fetchCategories = async (uid) => {
-    const ref  = collection(db, "categories", uid, "userCategories");
+    const ref = collection(db, "categories", uid, "userCategories");
     const snap = await getDocs(ref);
     setCategories(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
   };
@@ -172,7 +176,7 @@ export default function Categories() {
   const handleCreate = async () => {
     if (!newCategory.name) return alert("Category name required.");
     setSaving(true);
-    const uid         = auth.currentUser.uid;
+    const uid = auth.currentUser.uid;
     const categoryMeta = MARKETPLACE_CATEGORIES.find((c) => c.id === newCategory.name);
     if (!categoryMeta) { setSaving(false); return alert("Invalid category selected."); }
 
@@ -198,7 +202,7 @@ export default function Categories() {
   };
 
   const handleEdit = async () => {
-    const uid          = auth.currentUser.uid;
+    const uid = auth.currentUser.uid;
     setSaving(true);
     const categoryMeta = MARKETPLACE_CATEGORIES.find((c) => c.name === editData.name || c.id === editData.name);
     if (!categoryMeta) { setSaving(false); return alert("Invalid category selected."); }
@@ -248,7 +252,7 @@ export default function Categories() {
             <p className="text-sm text-gray-400 mt-0.5">{results.length} product{results.length !== 1 ? "s" : ""} found</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {results.map((p) => <ProductCard key={p.id} p={p} {...sharedCardProps} />)}
+            {results.map((p) => <ProductCard key={p.id} p={p} adding={adding} {...sharedCardProps} />)}
           </div>
         </div>
         <SaleModal />
@@ -431,7 +435,7 @@ export default function Categories() {
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 transition"
               >
                 <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                  <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
             </div>
@@ -482,7 +486,7 @@ export default function Categories() {
                 {saving ? (
                   <><span className="w-4 h-4 border-2 border-gray-600 border-t-white rounded-full animate-spin" /> Creating…</>
                 ) : (
-                  <><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg> Create Category</>
+                  <><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> Create Category</>
                 )}
               </button>
             </div>
@@ -502,7 +506,7 @@ export default function Categories() {
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 transition"
               >
                 <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                  <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
             </div>
@@ -550,7 +554,7 @@ export default function Categories() {
                 {saving ? (
                   <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Saving…</>
                 ) : (
-                  <><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg> Save Changes</>
+                  <><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> Save Changes</>
                 )}
               </button>
             </div>

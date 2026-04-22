@@ -151,10 +151,10 @@ export default function SearchBar() {
         {query?.trim() && (
           <button
             onClick={handleClear}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center
               justify-center rounded-full bg-gray-300 hover:bg-gray-400 text-white transition"
           >
-            <svg width="7" height="7" viewBox="0 0 10 10" fill="none">
+            <svg width="11" height="11" viewBox="0 0 10 10" fill="none">
               <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>

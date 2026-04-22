@@ -13,16 +13,16 @@ import { motion } from "framer-motion";
 
 export default function DashboardHome() {
   const { products, lowStockThreshold, loading } = useProducts();
-  const { setScope, results }                     = useSearch();
-  const { addToCart, adding }                     = useCart();
-  const { startSale }                             = useDirectSale();
-  const { currency }                              = useCurrency();
+  const { setScope, results } = useSearch();
+  const { addToCart, adding } = useCart();
+  const { startSale } = useDirectSale();
+  const { currency } = useCurrency();
 
   // Stats
-  const totalProducts  = products.length;
-  const lowStockCount  = products.filter((p) => p.quantity > 0 && p.quantity <= lowStockThreshold).length;
+  const totalProducts = products.length;
+  const lowStockCount = products.filter((p) => p.quantity > 0 && p.quantity <= lowStockThreshold).length;
   const outOfStockCount = products.filter((p) => p.quantity === 0).length;
-  const inStockCount   = totalProducts - outOfStockCount;
+  const inStockCount = totalProducts - outOfStockCount;
 
   useEffect(() => { setScope("all-products"); }, []);
 
@@ -54,9 +54,9 @@ export default function DashboardHome() {
         {!isSearching && !loading && totalProducts > 0 && (
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "In Stock",     value: inStockCount,    color: "text-green-600",  bg: "bg-green-50",  border: "border-green-100" },
-              { label: "Low Stock",    value: lowStockCount,   color: "text-amber-600",  bg: "bg-amber-50",  border: "border-amber-100" },
-              { label: "Out of Stock", value: outOfStockCount, color: "text-red-500",    bg: "bg-red-50",    border: "border-red-100"   },
+              { label: "In Stock", value: inStockCount, color: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
+              { label: "Low Stock", value: lowStockCount, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
+              { label: "Out of Stock", value: outOfStockCount, color: "text-red-500", bg: "bg-red-50", border: "border-red-100" },
             ].map(({ label, value, color, bg, border }) => (
               <div key={label} className={`${bg} border ${border} rounded-2xl px-4 py-3 text-center`}>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{label}</p>
@@ -110,7 +110,7 @@ export default function DashboardHome() {
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
             {listToRender.map((product, index) => {
               const isLowStock = product.quantity > 0 && product.quantity <= lowStockThreshold;
-              const isOut      = product.quantity === 0;
+              const isOut = product.quantity === 0;
 
               return (
                 <motion.div
@@ -125,11 +125,10 @@ export default function DashboardHome() {
                     }`}
                 >
                   {/* Accent bar */}
-                  <div className={`h-1 w-full ${
-                    isOut      ? "bg-red-400"
-                    : isLowStock ? "bg-amber-400"
-                    : "bg-gradient-to-r from-[#03165A] to-green-500"
-                  }`} />
+                  <div className={`h-1 w-full ${isOut ? "bg-red-400"
+                      : isLowStock ? "bg-amber-400"
+                        : "bg-gradient-to-r from-[#03165A] to-green-500"
+                    }`} />
 
                   {/* Image */}
                   <div className="relative">
@@ -158,9 +157,8 @@ export default function DashboardHome() {
 
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-400">
-                        Qty: <span className={`font-semibold ${
-                          isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"
-                        }`}>{product.quantity}</span>
+                        Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"
+                          }`}>{product.quantity}</span>
                       </span>
                       <span className="text-sm font-black text-[#03165A]">
                         {currency.symbol}{product.sellingPrice.toLocaleString()}

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { auth, db } from "../../firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import EnyotronicsLogo from "../../images/enyotronics-logo.png";
+import Logo from "../../images/me2sell-logo.png";
 import * as htmlToImage from "html-to-image";
 import {
     collection,
@@ -78,7 +78,7 @@ const getDateRange = (range, startDate, endDate) => {
 /* ─────────────────────────────────────────────────────────────────
    RECEIPT COMPONENT
 ───────────────────────────────────────────────────────────────── */
-const Receipt = React.forwardRef(({ sale, currency, profile }, ref) => {
+const Receipt = React.forwardRef(({ sale, currency, profile, customer }, ref) => {
     if (!sale) return null;
 
     const saleDate = sale.createdAt?.toDate
@@ -94,130 +94,272 @@ const Receipt = React.forwardRef(({ sale, currency, profile }, ref) => {
         <div
             ref={ref}
             style={{
-                width: "320px",
+                width: "360px",
                 backgroundColor: "#ffffff",
-                fontFamily: "'Courier New', Courier, monospace",
-                padding: "24px 20px",
                 color: "#111111",
                 boxSizing: "border-box",
+                overflow: "hidden",
             }}
         >
-            {/* Header */}
-            <div style={{ textAlign: "center", marginBottom: "16px" }}>
-                <div style={{ fontSize: "16px", fontWeight: "800", letterSpacing: "2px", textTransform: "uppercase" }}>
-                    {profile?.business?.businessName || "My Business"}
+            {/* ---- HEADER ---- */}
+            <div style={{ backgroundColor: "ffffff", padding: "24px 24px 20px", display: "flex", gap: "10px", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                    <div style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "1px", paddingRight: "10px" }}>
+                        {profile?.business?.businessName || "My Business"}
+                    </div>
+                    <div style={{ fontSize: "9px", color: "#8fa8d8", marginTop: "2px" }}>
+                        {profile?.business?.businessType || ""}
+                    </div>
                 </div>
-                <div style={{ fontSize: "11px", marginTop: "4px", color: "#555" }}>
-                    {profile?.business?.businessType || ""}
+                <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: "10px", color: "#404040", textTransform: "uppercase", letterSpacing: "1px" }}>Invoice ID.</div>
+                    <div style={{ fontSize: "8px", color: "#404040", fontWeight: "600", marginTop: "2px" }}>
+                        #{(sale.saleId || sale.id)?.slice(-10).toUpperCase()}
+                    </div>
                 </div>
-                {profile?.business?.businessAddress && (
-                    <div style={{ fontSize: "11px", color: "#555", marginTop: "2px" }}>
-                        {profile.business.businessAddress}
-                    </div>
-                )}
-                {profile?.business?.location?.city && (
-                    <div style={{ fontSize: "11px", color: "#555" }}>
-                        {profile.business.location.city}, {profile.business.location.state}
-                    </div>
-                )}
-                {profile?.admin?.phone?.full && (
-                    <div style={{ fontSize: "11px", color: "#555", marginTop: "2px" }}>
-                        Tel: {profile.admin.phone.full}
-                    </div>
-                )}
             </div>
 
-            <div style={{ borderTop: "2px dashed #ccc", margin: "12px 0" }} />
+            {/* ---- RECEIPT TITLE BAR ---- */}
+            <div style={{ backgroundColor: "#ced9fd", padding: "12px 24px" }}>
+                <div style={{ fontSize: "16px", fontWeight: "700", color: "#404040", letterSpacing: "3px" }}>INVOICE</div>
+            </div>
 
-            {/* Meta */}
-            <div style={{ fontSize: "11px", marginBottom: "12px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#555" }}>Receipt #:</span>
-                    <span style={{ fontWeight: "700" }}>{sale.saleId?.toUpperCase() || sale.id?.toUpperCase()}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-                    <span style={{ color: "#555" }}>Date:</span>
-                    <span>{saleDate.toLocaleDateString()}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-                    <span style={{ color: "#555" }}>Time:</span>
-                    <span>{saleDate.toLocaleTimeString()}</span>
-                </div>
-                {/* ✅ Show staff name on receipt if available */}
-                {sale.staffName && (
-                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-                        <span style={{ color: "#555" }}>Served by:</span>
-                        <span style={{ fontWeight: "600" }}>{sale.staffName}</span>
+            {/* ---- DATE ROW ---- */}
+            <div style={{ padding: "12px 24px", borderBottom: "0.5px solid #e5e7eb" }}>
+                <span style={{ fontSize: "10px", color: "#6b7280" }}>Date: </span>
+                <span style={{ fontSize: "10px", fontWeight: "600", color: "#111" }}>
+                    {saleDate.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}
+                </span>
+                <span style={{ fontSize: "10px", color: "#6b7280", marginLeft: "16px" }}>Time: </span>
+                <span style={{ fontSize: "10px", fontWeight: "600", color: "#111" }}>
+                    {saleDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </span>
+            </div>
+
+            {/* ---- BILLED TO / FROM ---- */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "0.5px solid #e5e7eb" }}>
+                {/* Billed To */}
+                <div style={{ padding: "14px 24px", borderRight: "0.5px solid #e5e7eb" }}>
+                    <div style={{ fontSize: "10px", fontWeight: "700", color: "#03165A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+                        Billed to
                     </div>
-                )}
+                    <div style={{ fontSize: "10px", fontWeight: "400", color: "#111" }}>
+                        {customer?.name || "Customer"}
+                    </div>
+                    {customer?.phone && (
+                        <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "2px" }}>
+                            {customer.phone}
+                        </div>
+                    )}
+                </div>
+                {/* From */}
+                <div style={{ padding: "14px 24px" }}>
+                    <div style={{ fontSize: "10px", fontWeight: "700", color: "#03165A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+                        From
+                    </div>
+                    <div style={{ fontSize: "10px", fontWeight: "400", color: "#111" }}>
+                        {profile?.business?.businessName || "My Business"}
+                    </div>
+                    {profile?.business?.businessAddress && (
+                        <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "2px" }}>
+                            {profile.business.businessAddress}
+                        </div>
+                    )}
+                    {profile?.admin?.phone?.full && (
+                        <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "2px" }}>
+                            Tel: {profile.admin.phone.full}
+                        </div>
+                    )}
+                </div>
             </div>
 
-            <div style={{ borderTop: "2px dashed #ccc", margin: "12px 0" }} />
+            {/* ---- ITEMS TABLE ---- */}
+            <div style={{ padding: "0 24px" }}>
+                {/* Table Header */}
+                <div style={{
+                    display: "flex", justifyContent: "space-between",
+                    fontSize: "10px", fontWeight: "700", textTransform: "uppercase",
+                    letterSpacing: "0.8px", color: "#03165A",
+                    borderBottom: "1.5px solid #03165A",
+                    padding: "12px 0 8px",
+                }}>
+                    <span style={{ flex: 2 }}>Item</span>
+                    <span style={{ flex: 1, textAlign: "center" }}>Qty</span>
+                    <span style={{ flex: 1, textAlign: "right" }}>Rate</span>
+                    <span style={{ flex: 1, textAlign: "right" }}>Amount</span>
+                </div>
 
-            {/* Items header */}
-            <div style={{
-                display: "flex", justifyContent: "space-between",
-                fontSize: "10px", fontWeight: "700", textTransform: "uppercase",
-                letterSpacing: "1px", color: "#555", marginBottom: "8px",
-                borderBottom: "2px solid #111",
-            }}>
-                <span style={{ flex: 2 }}>Item</span>
-                <span style={{ flex: 1, textAlign: "center" }}>Qty</span>
-                <span style={{ flex: 1, textAlign: "right" }}>Rate</span>
-                <span style={{ flex: 1, textAlign: "right" }}>Amount</span>
-            </div>
-
-            {/* Items */}
-            {sale.items.map((item, i) => {
-                const price = item.sellingPrice || item.price || 0;
-                const lineTotal = item.quantity * price;
-                return (
-                    <div key={i} style={{ marginBottom: "10px", paddingBottom: "8px", borderBottom: "2px dotted #e0e0e0" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#333" }}>
-                            <span style={{ flex: 2, fontSize: "12px", fontWeight: "600" }}>{item.name}</span>
-                            <span style={{ flex: 1, textAlign: "center" }}>{item.quantity}</span>
-                            <span style={{ flex: 1, textAlign: "right" }}>{currency.symbol}{price.toLocaleString()}</span>
+                {/* Table Rows */}
+                {sale.items.map((item, i) => {
+                    const price = item.sellingPrice || item.price || 0;
+                    const lineTotal = item.quantity * price;
+                    return (
+                        <div key={i} style={{
+                            display: "flex", justifyContent: "space-between",
+                            alignItems: "center",
+                            fontSize: "12px", color: "#333",
+                            padding: "9px 0",
+                            borderBottom: "0.5px solid #f0f0f0",
+                        }}>
+                            <span style={{ flex: 2, fontWeight: "600", fontSize: "13px" }}>{item.name}</span>
+                            <span style={{ flex: 1, textAlign: "center", color: "#6b7280" }}>{item.quantity}</span>
+                            <span style={{ flex: 1, textAlign: "right", color: "#6b7280" }}>{currency.symbol}{price.toLocaleString()}</span>
                             <span style={{ flex: 1, textAlign: "right", fontWeight: "600" }}>{currency.symbol}{lineTotal.toLocaleString()}</span>
                         </div>
+                    );
+                })}
+            </div>
+
+            {/* ---- TOTALS ---- */}
+            <div style={{ padding: "0 24px" }}>
+                {/* Subtotal */}
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#6b7280", padding: "10px 0 4px" }}>
+                    <span>Subtotal</span>
+                    <span>{currency.symbol}{subtotal.toLocaleString()}</span>
+                </div>
+
+                {sale.discount > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#e53e3e", paddingBottom: "4px" }}>
+                        <span>Discount</span>
+                        <span>-{currency.symbol}{sale.discount.toLocaleString()}</span>
                     </div>
-                );
-            })}
+                )}
 
-            {/* Totals */}
-            <div style={{ borderTop: "2px dashed #ccc", margin: "12px 0 8px" }} />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "6px", color: "#555" }}>
-                <span>Subtotal</span>
-                <span>{currency.symbol}{subtotal.toLocaleString()}</span>
+                {/* Total */}
+                <div style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "baseline",
+                    borderTop: "1.5px solid #03165A",
+                    padding: "12px 0 14px",
+                    gap: "40px",
+                }}>
+                    <span style={{ fontSize: "11px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "1px" }}>Total</span>
+                    <span style={{ fontSize: "20px", fontWeight: "700", color: "#03165A" }}>
+                        {currency.symbol}{sale.totalAmount?.toLocaleString()}
+                    </span>
+                </div>
             </div>
-            <div style={{ borderTop: "2px solid #111", margin: "8px 0" }} />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: "800" }}>
-                <span>TOTAL</span>
-                <span>{currency.symbol}{sale.totalAmount?.toLocaleString()}</span>
+
+            {/* ---- META ROW ---- */}
+            <div style={{ display: "flex", gap: "24px", padding: "10px 24px 14px", borderTop: "0.5px solid #e5e7eb" }}>
+                {sale.paymentMethod && (
+                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                        Payment: <span style={{ color: "#111", fontWeight: "600", textTransform: "capitalize" }}>{sale.paymentMethod}</span>
+                    </div>
+                )}
+                {(sale.staffName || sale.soldBy) && (
+                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                        Cashier: <span style={{ color: "#111", fontWeight: "600" }}>{sale.staffName || "Admin"}</span>
+                    </div>
+                )}
             </div>
 
-            <div style={{ borderTop: "2px dashed #ccc", margin: "16px 0 12px" }} />
+            {/* ---- FOOTER NOTE ---- */}
+            <div style={{ textAlign: "center", fontSize: "11px", color: "#6b7280", padding: "8px 24px 0", fontStyle: "italic" }}>
+                Thank you for your patronage — items sold are not returnable.
+            </div>
 
-            {/* Footer */}
-            <div style={{ textAlign: "center", fontSize: "11px", color: "#555" }}>
-                <div style={{ marginBottom: "4px" }}>Thank you for your patronage! 🙏</div>
-                <div style={{ marginBottom: "8px", fontStyle: "italic" }}>Items sold are not returnable.</div>
-                <div style={{ fontSize: "9px", color: "#999", borderTop: "1px solid #eee", paddingTop: "8px" }}>
-                    Powered by
-                    <img src={EnyotronicsLogo} alt="Enyotronics"
-                        style={{ width: "60px", display: "block", margin: "4px auto 0" }}
-                        crossOrigin="anonymous"
-                    />
+            {/* ---- WAVE FOOTER ---- */}
+            <div style={{ marginTop: "16px", position: "relative", height: "52px", overflow: "hidden" }}>
+                <div style={{
+                    position: "absolute", bottom: 0, left: 0, right: 0,
+                    height: "70px", backgroundColor: "#03165A",
+                    borderRadius: "60% 60% 0 0 / 100% 100% 0 0",
+                }} />
+                <div style={{
+                    position: "absolute", bottom: 0, right: 0,
+                    width: "45%", height: "60px", backgroundColor: "#4a5568",
+                    borderRadius: "60% 0 0 0 / 100% 0 0 0",
+                }} />
+                <div style={{
+                    position: "absolute", display: "flex", justifyContent: "center", bottom: "8px", left: 0, right: 0,
+                    textAlign: "center", fontSize: "10px", color: "#8fa8d8", zIndex: 1,
+                }}>
+                    Powered by: <img src={Logo} alt="me2sell" style={{ display: "inline-block", height: "14px", marginBottom: "-2px" }} />
                 </div>
             </div>
         </div>
     );
 });
+
 Receipt.displayName = "Receipt";
+
+// Customer Info Modal — collects optional customer details before showing receipt
+function CustomerInfoModal({ onConfirm, onClose }) {
+    const [name, setName] = useState("");
+    const [phone, setPhone] = useState("");
+
+    const handleSubmit = () => {
+        onConfirm({ name: name.trim(), phone: phone.trim() });
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900">Customer Details</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">For the receipt, both fields are optional</p>
+                    </div>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition">
+                        <FaTimes className="text-gray-500" />
+                    </button>
+                </div>
+
+                {/* Fields */}
+                <div className="px-5 py-5 space-y-4">
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Customer Name</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="e.g. John Doe"
+                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#03165A]/30 focus:border-[#03165A]"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Phone Number</label>
+                        <input
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="e.g. +234 800 000 0000"
+                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#03165A]/30 focus:border-[#03165A]"
+                        />
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="px-5 pb-5 space-y-2">
+                    <button
+                        onClick={handleSubmit}
+                        className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-900 text-white text-sm font-semibold transition"
+                    >
+                        Continue to Receipt
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="w-full py-2.5 rounded-xl text-sm text-gray-500 hover:bg-gray-100 transition"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+}
 
 /* ─────────────────────────────────────────────────────────────────
    RECEIPT MODAL
 ───────────────────────────────────────────────────────────────── */
-function ReceiptModal({ sale, currency, profile, onClose }) {
+function ReceiptModal({ sale, currency, profile, onClose, customer }) {
     const receiptRef = useRef(null);
     const [sharing, setSharing] = useState(false);
     const [printing, setPrinting] = useState(false);
@@ -315,7 +457,7 @@ function ReceiptModal({ sale, currency, profile, onClose }) {
 
                 <div className="overflow-y-auto max-h-[55vh] flex justify-center bg-gray-50 py-4 px-4">
                     <div className="shadow-md rounded">
-                        <Receipt ref={receiptRef} sale={sale} currency={currency} profile={profile} />
+                        <Receipt ref={receiptRef} sale={sale} currency={currency} profile={profile} customer={customer}/>
                     </div>
                 </div>
 
@@ -372,7 +514,10 @@ export default function StaffSalesHistory() {
     const [lastDoc, setLastDoc] = useState(null);
     const [hasMore, setHasMore] = useState(true);
     const [expandedId, setExpandedId] = useState(null);
-    const [receiptSale, setReceiptSale] = useState(null);
+    // Receipt modal state
+    const [pendingSale, setPendingSale] = useState(null); // waiting for customer info
+    const [receiptSale, setReceiptSale] = useState(null); // ready to show receipt
+    const [customer, setCustomer] = useState(null); // { name, phone }
 
     // ✅ Resolved owner info — staff can only see their own sales
     const [currentUser, setCurrentUser] = useState(null);
@@ -535,7 +680,7 @@ export default function StaffSalesHistory() {
                     <div className="flex flex-wrap gap-2">
                         {[
                             { key: "today", label: "Today" },
-                            { key: "week",  label: "This Week" },
+                            { key: "week", label: "This Week" },
                             { key: "month", label: "This Month" },
                         ].map(({ key, label }) => (
                             <button
@@ -731,10 +876,7 @@ export default function StaffSalesHistory() {
 
                                                         {/* Receipt button */}
                                                         <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setReceiptSale(sale);
-                                                            }}
+                                                            onClick={(e) => { e.stopPropagation(); setPendingSale(sale); }}
                                                             className="w-full flex items-center justify-center gap-2
                                                                        py-2.5 rounded-xl text-sm font-semibold
                                                                        bg-white dark:bg-gray-700
@@ -778,17 +920,31 @@ export default function StaffSalesHistory() {
                 )}
             </div>
 
-            {/* ── Receipt Modal ── */}
-            <AnimatePresence>
-                {receiptSale && (
-                    <ReceiptModal
-                        sale={receiptSale}
-                        currency={currency}
-                        profile={profile}
-                        onClose={() => setReceiptSale(null)}
-                    />
-                )}
-            </AnimatePresence>
+         {/* CUSTOMER INFO MODAL — step 1 */}
+      {pendingSale && (
+        <AnimatePresence>
+          <CustomerInfoModal
+            onConfirm={(info) => {
+              setCustomer(info);
+              setReceiptSale(pendingSale);
+              setPendingSale(null);
+            }}
+            onClose={() => setPendingSale(null)}
+          />
+        </AnimatePresence>
+      )}
+
+      {/* RECEIPT MODAL — step 2 */}
+      {receiptSale && (
+        <ReceiptModal
+          sale={receiptSale}
+          currency={currency}
+          profile={profile}
+          logoSrc={Logo}
+          customer={customer}
+          onClose={() => { setReceiptSale(null); setCustomer(null); }}
+        />
+      )}
         </StaffDashboardLayout>
     );
 }

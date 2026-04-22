@@ -52,7 +52,7 @@ export default function StaffManagement() {
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
 
-  const { addToCart } = useCart();
+  const { addToCart, adding } = useCart();
   const { startSale } = useDirectSale();
   const { currency } = useCurrency();
   const { products, lowStockThreshold } = useProducts();
@@ -806,7 +806,7 @@ export default function StaffManagement() {
   }
 
   // ── Shared product card (search results) ─────────────────────────────────────
-  function ProductCard({ product, currency, addToCart, startSale, lowStockThreshold }) {
+  function ProductCard({ product, currency, addToCart, startSale, lowStockThreshold, adding }) {
     const isLowStock = product.quantity > 0 && product.quantity <= lowStockThreshold;
     const isOut = product.quantity === 0;
 
@@ -844,7 +844,11 @@ export default function StaffManagement() {
             <div className="flex gap-2">
               <button onClick={() => addToCart(product)}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
-                <FaShoppingCart className="text-[10px]" /> Add
+                {adding === product.id ? (
+                  <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <><FaShoppingCart className="text-[10px]" /> Add</>
+                )}
               </button>
               <button onClick={() => startSale(product)}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
@@ -869,7 +873,7 @@ export default function StaffManagement() {
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {results.map((p) => (
               <ProductCard key={p.id} product={p} currency={currency}
-                addToCart={addToCart} startSale={startSale} lowStockThreshold={lowStockThreshold} />
+                addToCart={addToCart} startSale={startSale} lowStockThreshold={lowStockThreshold} adding={adding} />
             ))}
           </div>
         </div>
@@ -882,9 +886,9 @@ export default function StaffManagement() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3 justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Staff Management</h1>
+            <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">Staff Management</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
               Manage your team and their permissions
             </p>
@@ -892,7 +896,7 @@ export default function StaffManagement() {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-semibold transition shadow-lg"
+            className="flex items-center gap-2 px-2 md:px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-semibold transition shadow-lg"
           >
             <FaPlus /> Add Staff
           </button>

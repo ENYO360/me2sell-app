@@ -19,7 +19,7 @@ import {
 
 export default function StaffProducts() {
     const { products, loading, isLowStock, getLowStockProducts } = useProducts();
-    const { addToCart, ownerLoading } = useCart();
+    const { addToCart, ownerLoading, adding } = useCart();
     const { startSale } = useDirectSale();           // ✅ use context
     const { currency } = useCurrency();
 
@@ -195,6 +195,7 @@ export default function StaffProducts() {
                                 ownerLoading={ownerLoading}
                                 onAddToCart={handleAddToCart}
                                 onDirectSell={handleDirectSell}
+                                adding={adding}
                             />
                         ))}
                     </div>
@@ -230,7 +231,7 @@ function StatCard({ label, value, color, icon }) {
 }
 
 // ── Product Card ─────────────────────────────────────────────────────────────
-function ProductCard({ product, currency, isLowStock, ownerLoading, onAddToCart, onDirectSell }) {
+function ProductCard({ product, currency, isLowStock, ownerLoading, onAddToCart, onDirectSell, adding }) {
     const isOut = product.quantity === 0;
     const lowStock = isLowStock(product.quantity);
 
@@ -295,8 +296,11 @@ function ProductCard({ product, currency, isLowStock, ownerLoading, onAddToCart,
                         disabled={isOut || ownerLoading}
                         className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm dark:text-gray-300 dark:bg-gray-700 shadow-[#03165A]/20"
                     >
-                        <FaShoppingCart className="text-xs" />
-                        {ownerLoading ? 'Loading...' : 'Add'}
+                        {adding === product.id ? (
+                            <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <><FaShoppingCart className="text-[10px]" /> Add</>
+                        )}
                     </button>
 
                     <button
