@@ -347,7 +347,23 @@ export default function StaffCart() {
 
                   <motion.button
                     whileTap={{ scale: 0.97 }}
-                    onClick={handleConfirmCheckout}
+                    onClick={async () => {
+                        const numericPrices = {};
+                        Object.keys(editedPrices).forEach((id) => {
+                          numericPrices[id] = Number(editedPrices[id]) || 0;
+                        });
+
+                        try {
+                          const success = await checkoutCart(numericPrices);
+
+                          if (success) {
+                            setCheckoutOpen(false); // close ONLY if successful
+                          }
+                        } catch (error) {
+                          console.error("Checkout failed:", error);
+                          // optionally show error message
+                        }
+                      }}
                     disabled={confirming}
                     className={`flex-1 py-3 rounded-xl font-semibold text-sm
                                 text-white flex items-center justify-center gap-2

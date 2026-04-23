@@ -268,7 +268,7 @@ export default function Categories() {
         {!activeCategory ? (
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#03165A]">Categories</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#03165A] dark:text-[#163bbf]">Categories</h1>
               <p className="text-sm text-gray-400 mt-0.5">
                 {categories.length} categor{categories.length !== 1 ? "ies" : "y"}
               </p>

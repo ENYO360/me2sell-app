@@ -28,6 +28,7 @@ import { useDirectSale } from "../../context/DirectSaleContext";
 import { useCurrency } from "../../context/CurrencyContext";
 import { useProducts } from "../../context/ProductContext";
 import { useSearch } from "../../context/SearchContext";
+import StaffPerformanceModal from "../../components/StaffPerformanceModal";
 import {
   FaPlus,
   FaUser,
@@ -41,7 +42,8 @@ import {
   FaTimes,
   FaCheck,
   FaMoneyBillWave,
-  FaShoppingCart
+  FaShoppingCart,
+  FaChartLine
 } from 'react-icons/fa';
 
 export default function StaffManagement() {
@@ -51,6 +53,7 @@ export default function StaffManagement() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const [showPerformanceModal, setShowPerformanceModal] = useState(false);
 
   const { addToCart, adding } = useCart();
   const { startSale } = useDirectSale();
@@ -1039,6 +1042,17 @@ export default function StaffManagement() {
                               <button
                                 onClick={() => {
                                   setSelectedStaff(member);
+                                  setShowPerformanceModal(true);
+                                  setActionMenu(null);
+                                }}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2"
+                              >
+                                <FaChartLine /> View Performance
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  setSelectedStaff(member);
                                   setShowPermissionsModal(true);
                                   setActionMenu(null);
                                 }}
@@ -1087,6 +1101,16 @@ export default function StaffManagement() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSuccess={fetchStaff}
+      />
+
+      <StaffPerformanceModal
+        isOpen={showPerformanceModal}
+        onClose={() => {
+          setShowPerformanceModal(false);
+          setSelectedStaff(null);
+        }}
+        staff={selectedStaff}
+        currency={currency}
       />
 
       <EditPermissionsModal

@@ -92,7 +92,7 @@ export default function ConfirmationModal() {
             exit={{    scale: 0.88, opacity: 0, y: 16 }}
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-sm bg-white dark:bg-gray-600 rounded-3xl shadow-2xl overflow-hidden"
           >
             {/* ── Top accent bar ── */}
             <div className={`h-1.5 w-full ${
@@ -108,10 +108,10 @@ export default function ConfirmationModal() {
                 <ModalIcon type={type} />
 
                 <div className="pt-1 min-w-0">
-                  <h3 className="text-lg font-bold text-[#03165A] leading-snug">
+                  <h3 className="text-lg font-bold text-[#03165A] dark:text-gray-200 leading-snug">
                     {modal.title ?? ""}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+                  <p className="text-sm text-gray-500 dark:text-gray-300 mt-1 leading-relaxed">
                     {modal.message}
                   </p>
                 </div>

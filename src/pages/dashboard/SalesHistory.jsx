@@ -791,7 +791,7 @@ export default function SalesHistory() {
       <DashboardLayout>
         <div className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold text-[#03165A]">Search Results</h2>
+            <h2 className="text-2xl font-bold text-[#03165A] dark:text-[#163bbf]">Search Results</h2>
             <p className="text-sm text-gray-400 mt-0.5">{results.length} product{results.length !== 1 ? "s" : ""} found</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -815,7 +815,7 @@ export default function SalesHistory() {
         <>
           {/* ========== FILTERS ========== */}
           <div className="flex flex-col gap-4 mb-6">
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-200">
+            <h2 className="text-xl md:text-2xl font-semibold text-[#03165A] dark:text-[#163bbf]">
               Sales History
             </h2>
 

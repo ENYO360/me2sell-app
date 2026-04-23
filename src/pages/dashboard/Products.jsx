@@ -345,7 +345,7 @@ export default function Products() {
         {/* ── HEADER ── */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-blue-500">Products</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-blue-500 dark:text-[#163bbf]">Products</h1>
             <p className="text-sm text-gray-400 mt-0.5">
               {products.length} product{products.length !== 1 ? "s" : ""} total
             </p>

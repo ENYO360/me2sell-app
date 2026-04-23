@@ -39,7 +39,7 @@ export default function DashboardHome() {
         {/* ── HEADER ── */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#03165A]">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#03165A] dark:text-[#163bbf]">
               {isSearching ? "Search Results" : "Available Products"}
             </h1>
             <p className="text-sm text-gray-400 mt-0.5">
@@ -58,7 +58,7 @@ export default function DashboardHome() {
               { label: "Low Stock", value: lowStockCount, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
               { label: "Out of Stock", value: outOfStockCount, color: "text-red-500", bg: "bg-red-50", border: "border-red-100" },
             ].map(({ label, value, color, bg, border }) => (
-              <div key={label} className={`${bg} border ${border} rounded-2xl px-4 py-3 text-center`}>
+              <div key={label} className={`${bg} border ${border} dark:bg-gray-700 rounded-2xl px-4 py-3 text-center`}>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{label}</p>
                 <p className={`text-2xl font-black mt-0.5 ${color}`}>{value}</p>
               </div>
@@ -70,12 +70,12 @@ export default function DashboardHome() {
         {loading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
-                <div className="h-36 bg-gray-100 w-full" />
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-pulse">
+                <div className="h-36 bg-gray-100 dark:bg-gray-700 w-full" />
                 <div className="p-3 space-y-2">
-                  <div className="h-3.5 bg-gray-100 rounded-lg w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded-lg w-1/2" />
-                  <div className="h-8 bg-gray-100 rounded-xl w-full mt-1" />
+                  <div className="h-3.5 bg-gray-100 dark:bg-gray-600 rounded-lg w-3/4" />
+                  <div className="h-3 bg-gray-100 dark:bg-gray-600 rounded-lg w-1/2" />
+                  <div className="h-8 bg-gray-100 dark:bg-gray-600 rounded-xl w-full mt-1" />
                 </div>
               </div>
             ))}
@@ -118,7 +118,7 @@ export default function DashboardHome() {
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(index * 0.03, 0.3), type: "spring", stiffness: 340, damping: 26 }}
-                  className={`group relative bg-white rounded-2xl border overflow-hidden shadow-sm transition-all
+                  className={`group relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
                     ${isOut
                       ? "opacity-70 border-gray-100"
                       : "border-gray-100 hover:shadow-md hover:border-[#03165A]/15"
@@ -151,7 +151,7 @@ export default function DashboardHome() {
 
                   {/* Body */}
                   <div className="p-3 space-y-2">
-                    <h3 className="font-bold text-sm text-gray-900 line-clamp-2 leading-snug">
+                    <h3 className="font-bold text-sm text-gray-900 dark:text-gray-300 line-clamp-2 leading-snug">
                       {product.name}
                     </h3>
 
@@ -160,7 +160,7 @@ export default function DashboardHome() {
                         Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"
                           }`}>{product.quantity}</span>
                       </span>
-                      <span className="text-sm font-black text-[#03165A]">
+                      <span className="text-sm font-black text-[#03165A] dark:text-gray-300">
                         {currency.symbol}{product.sellingPrice.toLocaleString()}
                       </span>
                     </div>
@@ -174,7 +174,7 @@ export default function DashboardHome() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => addToCart(product)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl dark:border hover:text-sm text-gray-800 dark:text-gray-400  text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
                         >
                           {adding === product.id ? (
                             <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
@@ -185,7 +185,7 @@ export default function DashboardHome() {
 
                         <button
                           onClick={() => startSale(product)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm dark:text-gray-400 dark:border text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
                         >
                           <FaCashRegister className="text-[10px]" /> Sell
                         </button>

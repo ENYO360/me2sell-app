@@ -115,7 +115,7 @@ export default function StaffDashboardLayout({ children }) {
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex fixed top-0 h-full w-64 bg-gradient-to-b from-purple-600 to-indigo-700 shadow-xl flex-col p-4 z-50">
+            <aside className="hidden lg:flex fixed top-0 h-full w-64 bg-gradient-to-b from-blue-600 to-indigo-700 shadow-xl flex-col p-4 z-50">
                 <Link to="/" className="mb-8 mt-2">
                     <img src={Logo} alt="Me2sell Logo" className="w-20 mx-auto hover:scale-105 transition" />
                 </Link>
@@ -130,14 +130,14 @@ export default function StaffDashboardLayout({ children }) {
                             <p className="text-white font-semibold text-sm truncate">
                                 {staffInfo.name}
                             </p>
-                            <p className="text-purple-200 text-xs truncate">
+                            <p className="text-blue-200 text-xs truncate">
                                 {formatRole(staffInfo.role)}
                             </p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/20">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                        <span className="text-purple-100 text-xs truncate">
+                        <span className="text-blue-100 text-xs truncate">
                             {staffInfo.businessName}
                         </span>
                     </div>
@@ -152,7 +152,7 @@ export default function StaffDashboardLayout({ children }) {
                                 to={item.to}
                                 className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                                     isActive 
-                                        ? "text-purple-900 font-semibold bg-white shadow-lg" 
+                                        ? "text-blue-900 font-semibold bg-white shadow-lg" 
                                         : "text-white hover:bg-white/10"
                                 }`}
                             >
@@ -189,7 +189,7 @@ export default function StaffDashboardLayout({ children }) {
                             animate={{ x: 0, opacity: 1 }}
                             exit={{ x: -300, opacity: 0 }}
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-purple-600 to-indigo-700 shadow-2xl p-4 flex flex-col z-50 lg:hidden"
+                            className="fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-600 to-indigo-700 shadow-2xl p-4 flex flex-col z-50 lg:hidden"
                         >
                             <div className="flex justify-between items-center mb-6">
                                 <Link to="/" onClick={() => setOpen(false)}>
@@ -213,14 +213,14 @@ export default function StaffDashboardLayout({ children }) {
                                         <p className="text-white font-semibold text-sm truncate">
                                             {staffInfo.name}
                                         </p>
-                                        <p className="text-purple-200 text-xs truncate">
+                                        <p className="text-blue-200 text-xs truncate">
                                             {formatRole(staffInfo.role)}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/20">
                                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                                    <span className="text-purple-100 text-xs truncate">
+                                    <span className="text-blue-100 text-xs truncate">
                                         {staffInfo.businessName}
                                     </span>
                                 </div>
@@ -236,7 +236,7 @@ export default function StaffDashboardLayout({ children }) {
                                             onClick={() => setOpen(false)}
                                             className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                                                 isActive 
-                                                    ? "text-purple-900 font-semibold bg-white shadow-lg" 
+                                                    ? "text-blue-900 font-semibold bg-white shadow-lg" 
                                                     : "text-white"
                                             }`}
                                         >
@@ -270,19 +270,19 @@ export default function StaffDashboardLayout({ children }) {
                             {/* Mobile Menu Toggle */}
                             <button
                                 onClick={() => setOpen(!open)}
-                                className="p-2 lg:hidden rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 transition"
+                                className="p-2 lg:hidden rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition"
                             >
                                 <FaBars />
                             </button>
 
                             {/* Staff Badge - Desktop Header */}
-                            <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl border border-purple-200 dark:border-purple-800">
-                                <FaIdBadge className="text-purple-600 dark:text-purple-400" />
+                            <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl border border-blue-200 dark:border-blue-800">
+                                <FaIdBadge className="text-blue-600 dark:text-blue-400" />
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
+                                    <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">
                                         {staffInfo.name}
                                     </span>
-                                    <span className="text-xs text-purple-600 dark:text-purple-400">
+                                    <span className="text-xs text-blue-600 dark:text-blue-400">
                                         {formatRole(staffInfo.role)}
                                     </span>
                                 </div>
@@ -296,9 +296,9 @@ export default function StaffDashboardLayout({ children }) {
                                 to="/staff/cart" 
                                 className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition group"
                             >
-                                <FaShoppingCart className="text-xl text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition" />
+                                <FaShoppingCart className="text-xl text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition" />
                                 {totalItemsInCart > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg">
+                                    <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg">
                                         {totalItemsInCart}
                                     </span>
                                 )}
@@ -320,13 +320,13 @@ export default function StaffDashboardLayout({ children }) {
 
                     {/* Mobile Staff Info */}
                     <div className="lg:hidden px-4 pb-3">
-                        <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-lg border border-purple-200 dark:border-purple-800">
-                            <FaIdBadge className="text-purple-600 dark:text-purple-400" />
+                        <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <FaIdBadge className="text-blue-600 dark:text-blue-400" />
                             <div className="flex flex-col flex-1 min-w-0">
-                                <span className="text-xs font-semibold text-purple-700 dark:text-purple-300 truncate">
+                                <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 truncate">
                                     {staffInfo.name}
                                 </span>
-                                <span className="text-xs text-purple-600 dark:text-purple-400 truncate">
+                                <span className="text-xs text-blue-600 dark:text-blue-400 truncate">
                                     {formatRole(staffInfo.role)} • {staffInfo.businessName}
                                 </span>
                             </div>

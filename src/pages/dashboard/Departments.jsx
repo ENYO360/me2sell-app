@@ -230,7 +230,7 @@ export default function Departments() {
         {!selectedDept ? (
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#03165A]">Departments</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#03165A] dark:text-[#163bbf]">Departments</h1>
               <p className="text-sm text-gray-400 mt-0.5">
                 {departments.length} department{departments.length !== 1 ? "s" : ""}
               </p>

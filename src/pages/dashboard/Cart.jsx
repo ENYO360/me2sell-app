@@ -170,7 +170,7 @@ export default function Cart() {
         {/* ── HEADER ── */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#03165A]">Cart</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#03165A] dark:text-[#163bbf]">Cart</h1>
             <p className="text-sm text-gray-400 mt-0.5">
               {cartItems.length === 0
                 ? "No items yet"

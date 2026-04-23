@@ -279,9 +279,9 @@ export default function StaffDashboard() {
             to: '/staff/sales-history',
             icon: <FaHistory />,
             label: 'Sales History',
-            bg: 'bg-purple-100 dark:bg-purple-900/30',
-            text: 'text-purple-600 dark:text-purple-400',
-            border: 'hover:border-purple-500',
+            bg: 'bg-gray-100 dark:bg-gray-900/30',
+            text: 'text-gray-800 dark:text-gray-400',
+            border: 'hover:border-blue-500',
         },
     ];
 
@@ -585,10 +585,10 @@ const TABS = [
         key:        'month',
         label:      'This Month',
         icon:       FaCalendar,
-        activeBg:   'bg-purple-600',
+        activeBg:   'bg-blue-800',
         activeText: 'text-white',
-        color:      'text-purple-600 dark:text-purple-400',
-        iconBg:     'bg-purple-100 dark:bg-purple-900/30',
+        color:      'text-blue-800 dark:text-blue-800',
+        iconBg:     'bg-blue-100 dark:bg-blue-900/30',
     },
 ];
 

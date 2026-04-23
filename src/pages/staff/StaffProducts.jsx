@@ -238,7 +238,7 @@ function ProductCard({ product, currency, isLowStock, ownerLoading, onAddToCart,
     return (
         <div className={`bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg
                          transition overflow-hidden
-                         ${lowStock ? 'border-2 border-orange-400' : ''}`}>
+                         ${isOut ? 'border-4 border-red-600' : isLowStock ? 'border-2 border-orange-400' : 'border-2 border-blue-400'}`}>
 
             {/* Image */}
             <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
