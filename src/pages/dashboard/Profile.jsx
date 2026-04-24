@@ -266,61 +266,61 @@ export default function Profile() {
     </label>
   );
 
-  // ── Shared product card (search results) ─────────────────────────────────────
-  function ProductCard({ product, currency, addToCart, startSale, lowStockThreshold, adding }) {
-    const isLowStock = product.quantity > 0 && product.quantity <= lowStockThreshold;
-    const isOut = product.quantity === 0;
-
-    return (
-      <motion.div
-        key={product.id}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`relative bg-white rounded-2xl border overflow-hidden shadow-sm transition-all
-        ${isOut ? "opacity-70 border-gray-100" : "border-gray-100 hover:shadow-md hover:border-[#03165A]/15"}`}
-      >
-        <div className={`h-1 w-full ${isOut ? "bg-red-400" : isLowStock ? "bg-amber-400" : "bg-gradient-to-r from-[#03165A] to-green-500"}`} />
-        <div className="relative">
-          <ProductImageCarousel images={[product.image, product.image2].filter(Boolean)} />
-          {isLowStock && !isOut && (
-            <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full animate-pulse">
-              Low · {product.quantity}
-            </span>
-          )}
-          {isOut && (
-            <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded-full">
-              Out of Stock
-            </span>
-          )}
-        </div>
-        <div className="p-3 space-y-2">
-          <h3 className="font-bold text-sm text-gray-900 line-clamp-1">{product.name}</h3>
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-400">Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"}`}>{product.quantity}</span></span>
-            <span className="font-black text-[#03165A]">{currency.symbol}{product.sellingPrice.toLocaleString()}</span>
-          </div>
-          {isOut ? (
-            <div className="w-full text-center bg-red-50 text-red-500 border border-red-200 py-2 rounded-xl text-xs font-bold">Out of Stock</div>
-          ) : (
-            <div className="flex gap-2">
-              <button onClick={() => addToCart(product)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
-                {adding === product.id ? (
-                  <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <><FaShoppingCart className="text-[10px]" /> Add</>
-                )}
-              </button>
-              <button onClick={() => startSale(product)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
-                <FaMoneyBillWave className="text-[10px]" /> Sell
-              </button>
-            </div>
-          )}
-        </div>
-      </motion.div>
-    );
-  }
+ // ── Shared product card (search results) ─────────────────────────────────────
+ function ProductCard({ product, currency, addToCart, startSale, lowStockThreshold, adding }) {
+   const isLowStock = product.quantity > 0 && product.quantity <= lowStockThreshold;
+   const isOut = product.quantity === 0;
+ 
+   return (
+     <motion.div
+       key={product.id}
+       initial={{ opacity: 0, y: 12 }}
+       animate={{ opacity: 1, y: 0 }}
+       className={`relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
+         ${isOut ? "opacity-70 border-gray-100" : "border-gray-100 hover:shadow-md hover:border-[#03165A]/15"}`}
+     >
+       <div className={`h-1 w-full ${isOut ? "bg-red-400" : isLowStock ? "bg-amber-400" : "bg-gradient-to-r from-[#03165A] to-green-500"}`} />
+       <div className="relative">
+         <ProductImageCarousel images={[product.image, product.image2].filter(Boolean)} />
+         {isLowStock && !isOut && (
+           <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full animate-pulse">
+             Low · {product.quantity}
+           </span>
+         )}
+         {isOut && (
+           <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded-full">
+             Out of Stock
+           </span>
+         )}
+       </div>
+       <div className="p-3 space-y-2">
+         <h3 className="font-bold text-sm text-gray-900 dark:text-gray-300 line-clamp-1">{product.name}</h3>
+         <div className="flex items-center justify-between text-xs">
+           <span className="text-gray-400">Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"}`}>{product.quantity}</span></span>
+           <span className="font-black text-[#03165A] dark:text-gray-300">{currency.symbol}{product.sellingPrice.toLocaleString()}</span>
+         </div>
+         {isOut ? (
+           <div className="w-full text-center bg-red-50 text-red-500 border border-red-200 py-2 rounded-xl text-xs font-bold">Out of Stock</div>
+         ) : (
+           <div className="flex gap-2">
+             <button onClick={() => addToCart(product)}
+               className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+               {adding === product.id ? (
+                 <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
+               ) : (
+                 <><FaShoppingCart className="text-[10px]" /> Add</>
+               )}
+             </button>
+             <button onClick={() => startSale(product)}
+               className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+               <FaMoneyBillWave className="text-[10px]" /> Sell
+             </button>
+           </div>
+         )}
+       </div>
+     </motion.div>
+   );
+ }
 
   const searchActive = results.length > 0;
   const displayList = searchActive ? results : products;

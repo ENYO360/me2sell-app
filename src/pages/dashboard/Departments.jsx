@@ -149,8 +149,8 @@ export default function Departments() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`relative bg-white rounded-2xl border overflow-hidden shadow-sm transition-all
-          ${isOut ? "opacity-70 border-gray-100" : "border-gray-100 hover:shadow-md hover:border-[#03165A]/15"}`}
+        className={`relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
+          ${isOut ? "opacity-70 border-gray-100" : "border-gray-100 dark:border-gray-500 hover:shadow-md hover:border-[#03165A]/15"}`}
       >
         {/* accent bar */}
         <div className={`h-1 w-full ${isOut ? "bg-red-400" : isLowStock ? "bg-amber-400" : "bg-gradient-to-r from-[#03165A] to-green-500"}`} />
@@ -171,10 +171,10 @@ export default function Departments() {
         </div>
 
         <div className="p-3 space-y-2">
-          <h5 className="font-bold text-sm text-gray-900 line-clamp-1">{p.name}</h5>
+          <h5 className="font-bold text-sm text-gray-900 dark:text-gray-300 line-clamp-1">{p.name}</h5>
           <div className="flex justify-between items-center text-xs text-gray-500">
             <span>Stock: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"}`}>{p.quantity ?? 0}</span></span>
-            <span className="font-bold text-[#03165A]">{currency.symbol}{(p.sellingPrice ?? p.price ?? 0).toLocaleString()}</span>
+            <span className="font-bold text-[#03165A] dark:text-[#163bbf]">{currency.symbol}{(p.sellingPrice ?? p.price ?? 0).toLocaleString()}</span>
           </div>
           {p.category && <p className="text-[10px] text-gray-400">Category: {p.category}</p>}
 
@@ -185,7 +185,7 @@ export default function Departments() {
           ) : (
             <div className="flex gap-2">
               <button onClick={() => addToCart(p)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+                className="flex-1 flex items-center dark:border dark:border-gray-500 dark:text-gray-500 justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
                 {adding === p.id ? (
                   <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
                 ) : (
@@ -193,7 +193,7 @@ export default function Departments() {
                 )}
               </button>
               <button onClick={() => startSale(p)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+                className="flex-1 flex items-center dark:border dark:border-gray-500 dark:text-gray-500 justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
                 <FaMoneyBillWave className="text-[10px]" /> Sell
               </button>
             </div>
@@ -244,17 +244,17 @@ export default function Departments() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <button onClick={() => setSelectedDept(null)}
-                className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-[#03165A] transition shadow-sm flex-shrink-0">
+                className="w-9 h-9 flex items-center justify-center dark:text-gray-300 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 text-[#03165A] transition shadow-sm flex-shrink-0">
                 <FaArrowLeft className="text-sm" />
               </button>
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Department</p>
-                <h1 className="text-xl sm:text-2xl font-bold text-[#03165A] truncate">{selectedDept.name}</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-[#03165A] dark:text-[#163bbf] truncate">{selectedDept.name}</h1>
               </div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button onClick={() => handleEdit(selectedDept)}
-                className="px-4 py-2 rounded-xl border-2 border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
+                className="px-4 py-2 rounded-xl border-2 border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-400 transition">
                 Edit
               </button>
               <button onClick={() => handleDelete(selectedDept)}
@@ -269,11 +269,11 @@ export default function Departments() {
         {fetching && (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3 animate-pulse">
-                <div className="h-4 bg-gray-100 rounded-lg w-3/4" />
-                <div className="h-3 bg-gray-100 rounded-lg w-full" />
-                <div className="h-3 bg-gray-100 rounded-lg w-1/2" />
-                <div className="h-8 bg-gray-100 rounded-xl w-full mt-2" />
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 p-5 space-y-3 animate-pulse">
+                <div className="h-4 bg-gray-100 dark:bg-gray-600 rounded-lg w-3/4" />
+                <div className="h-3 bg-gray-100 dark:bg-gray-600 rounded-lg w-full" />
+                <div className="h-3 bg-gray-100 dark:bg-gray-600 rounded-lg w-1/2" />
+                <div className="h-8 bg-gray-100 dark:bg-gray-600 rounded-xl w-full mt-2" />
               </div>
             ))}
           </div>
@@ -302,7 +302,7 @@ export default function Departments() {
                   >
                     <div
                       onClick={() => { setSelectedDept(dept); setMenuOpenFor(null); }}
-                      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#03165A]/15 transition-all cursor-pointer overflow-hidden h-full"
+                      className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-600 shadow-sm hover:shadow-md dark:hover:shadow-lg hover:border-[#03165A]/15 transition-all cursor-pointer overflow-hidden h-full"
                     >
                       {/* Accent */}
                       <div className="h-1 w-full bg-gradient-to-r from-[#03165A] to-green-500" />
@@ -311,14 +311,14 @@ export default function Departments() {
                         {/* Name + menu */}
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">
-                            <h3 className="font-bold text-gray-900 text-sm sm:text-base line-clamp-1">{dept.name}</h3>
+                            <h3 className="font-bold text-gray-900 dark:text-gray-300 text-sm sm:text-base line-clamp-1">{dept.name}</h3>
                             <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">
                               {dept.description || "No description"}
                             </p>
                           </div>
                           <button
                             onClick={(e) => { e.stopPropagation(); setMenuOpenFor(menuOpenFor === dept.id ? null : dept.id); }}
-                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition flex-shrink-0"
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-300 text-gray-400 hover:text-gray-600 transition flex-shrink-0"
                           >
                             <FaEllipsisV className="text-xs" />
                           </button>
@@ -328,7 +328,7 @@ export default function Departments() {
                         <div className="flex items-end justify-between pt-1">
                           <div className="bg-blue-500/[0.05] rounded-xl px-3 py-2 text-center">
                             <p className="text-[10px] text-gray-400 uppercase tracking-widest">Products</p>
-                            <p className="text-xl font-black text-[#03165A] mt-0.5">{deptCounts[dept.id] ?? 0}</p>
+                            <p className="text-xl font-black text-[#03165A] dark:text-[#163bbf] mt-0.5">{deptCounts[dept.id] ?? 0}</p>
                           </div>
                           {dept.createdAt?.toDate && (
                             <p className="text-[10px] text-gray-300 text-right leading-tight">
@@ -348,18 +348,18 @@ export default function Departments() {
                           exit={{ opacity: 0, scale: 0.9, y: -4 }}
                           transition={{ duration: 0.13 }}
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute top-12 right-3 w-36 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-30"
+                          className="absolute top-12 right-3 w-36 bg-white dark:bg-gray-600 rounded-xl shadow-lg border border-gray-100 dark:border-gray-500 overflow-hidden z-30"
                         >
                           <button
                             onClick={() => { handleEdit(dept); setMenuOpenFor(null); }}
-                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-500 transition"
                           >
                             <FaEdit className="text-[#03165A] text-xs" /> Edit
                           </button>
-                          <div className="h-px bg-gray-100 mx-2" />
+                          <div className="h-px bg-gray-100 dark:bg-gray-500 mx-2" />
                           <button
                             onClick={() => { handleDelete(dept); setMenuOpenFor(null); }}
-                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition"
+                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-200   transition"
                           >
                             <FaTrash className="text-xs" /> Delete
                           </button>
@@ -377,21 +377,21 @@ export default function Departments() {
         {!fetching && selectedDept && (
           <div className="space-y-5">
             {/* Info card */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-600 shadow-sm overflow-hidden">
               <div className="h-1.5 bg-gradient-to-r from-[#03165A] via-[#0d6b4e] to-green-500" />
               <div className="p-5 space-y-4">
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                   {selectedDept.description || "No description provided."}
                 </p>
                 <div className="flex gap-4 flex-wrap">
                   <div className="bg-blue-500/[0.04] rounded-xl px-4 py-3 text-center">
                     <p className="text-[10px] uppercase tracking-widest text-gray-400">Products</p>
-                    <p className="text-2xl font-black text-[#03165A] mt-0.5">{deptCounts[selectedDept.id] ?? 0}</p>
+                    <p className="text-2xl font-black text-[#03165A] dark:text-[#163bbf] mt-0.5">{deptCounts[selectedDept.id] ?? 0}</p>
                   </div>
                   {selectedDept.createdAt?.toDate && (
-                    <div className="bg-gray-50 rounded-xl px-4 py-3">
+                    <div className="bg-gray-50 dark:bg-gray-600 rounded-xl px-4 py-3">
                       <p className="text-[10px] uppercase tracking-widest text-gray-400">Created</p>
-                      <p className="text-sm font-semibold text-gray-700 mt-0.5">
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-0.5">
                         {selectedDept.createdAt.toDate().toLocaleDateString()}
                       </p>
                     </div>
@@ -402,7 +402,7 @@ export default function Departments() {
 
             {/* Products in dept */}
             <div className="space-y-4">
-              <h4 className="font-bold text-[#03165A] text-lg">
+              <h4 className="font-bold text-[#03165A] dark:text-[#163bbf] text-lg">
                 Products in <span className="text-green-600">{selectedDept.name}</span>
               </h4>
 
@@ -437,7 +437,7 @@ export default function Departments() {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full sm:max-w-md bg-white sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl"
+              className="relative w-full sm:max-w-md bg-white dark:bg-gray-700 sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl"
               style={{
                 transform: modalVisible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.97)",
                 opacity: modalVisible ? 1 : 0,
@@ -460,12 +460,12 @@ export default function Departments() {
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-green-600 mb-0.5">
                       {editingDept ? "Edit" : "New"}
                     </p>
-                    <h3 className="text-2xl font-bold text-[#03165A]">
+                    <h3 className="text-2xl font-bold text-[#03165A] dark:text-[#163bbf]">
                       {editingDept ? "Edit Department" : "Add Department"}
                     </h3>
                   </div>
                   <button onClick={closeModal}
-                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 transition">
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-400 dark:text-gray-300 transition">
                     <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
                       <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
@@ -485,7 +485,7 @@ export default function Departments() {
                       onChange={handleChange}
                       placeholder="e.g. Electronics"
                       required
-                      className="w-full px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition"
+                      className="w-full px-4 py-2.5 text-sm dark:text-gray-300 font-medium border border-gray-200 dark:border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-600 focus:bg-white dark:focus:bg-gray-500 focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition"
                     />
                   </div>
 
@@ -499,7 +499,7 @@ export default function Departments() {
                       onChange={handleChange}
                       placeholder="Brief description of this department…"
                       rows={3}
-                      className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition resize-none"
+                      className="w-full px-4 py-2.5 text-sm dark:text-gray-300 border border-gray-200 dark:border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-600 focus:bg-white dark:focus:bg-gray-500 focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition resize-none"
                     />
                   </div>
 
@@ -511,7 +511,7 @@ export default function Departments() {
                     <button
                       type="button"
                       onClick={closeModal}
-                      className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 active:scale-95 transition-all"
+                      className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-300 active:scale-95 transition-all"
                     >
                       Cancel
                     </button>

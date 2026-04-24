@@ -56,7 +56,7 @@ export default function SaleModal() {
       {/* Modal sheet */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full sm:max-w-md bg-white sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl"
+        className="relative w-full sm:max-w-md bg-white dark:bg-gray-700 sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl"
         style={{
           transform: visible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.97)",
           opacity: visible ? 1 : 0,
@@ -79,7 +79,7 @@ export default function SaleModal() {
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-green-500 mb-1">
                 Direct Sale
               </p>
-              <h2 className="text-2xl font-bold text-[#03165A] leading-tight">
+              <h2 className="text-2xl font-bold text-[#03165A] dark:text-[#163bbf] leading-tight">
                 {selectedProduct.name}
               </h2>
             </div>
@@ -87,7 +87,7 @@ export default function SaleModal() {
             {/* Close button */}
             <button
               onClick={cancelSale}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition -mt-1"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-200 transition -mt-1"
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -104,7 +104,7 @@ export default function SaleModal() {
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-[11px] font-semibold text-[#03165A] hover:text-[#FA212F] transition flex items-center gap-1"
+                  className="text-[11px] font-semibold text-[#03165A] dark:text-[#163bbf] hover:text-[#FA212F] transition flex items-center gap-1"
                 >
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/>
@@ -120,9 +120,9 @@ export default function SaleModal() {
                 onClick={() => setIsEditing(true)}
                 className="group relative flex items-center cursor-pointer"
               >
-                <div className="flex-1 flex items-center gap-3 px-5 py-4 rounded-2xl border-2 border-gray-100 bg-gray-50 group-hover:border-[#03165A]/20 group-hover:bg-[#03165A]/[0.02] transition">
-                  <span className="text-lg font-bold text-gray-400">{currency.symbol}</span>
-                  <span className="text-4xl font-black text-[#03165A] tracking-tight">
+                <div className="flex-1 flex items-center gap-3 px-5 py-4 rounded-2xl border-2 border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-gray-500 group-hover:border-[#03165A]/20 group-hover:bg-[#03165A]/[0.02] transition">
+                  <span className="text-lg font-bold text-gray-400 dark:text-gray-300">{currency.symbol}</span>
+                  <span className="text-4xl font-black text-[#03165A] dark:text-[#163bbf] tracking-tight">
                     {Number(price).toLocaleString()}
                   </span>
                 </div>
@@ -145,7 +145,7 @@ export default function SaleModal() {
             ) : (
               /* Edit mode */
               <div className="relative">
-                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-lg font-bold text-gray-300 pointer-events-none select-none">
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-lg font-bold text-gray-300 dark:text-gray-500 pointer-events-none select-none">
                   {currency.symbol}
                 </span>
                 <input

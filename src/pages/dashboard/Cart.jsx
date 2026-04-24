@@ -49,118 +49,81 @@ export default function Cart() {
   const searchActive = results.length > 0;
   const displayList = searchActive ? results : products;
 
-  if (searchActive) {
+  // ── Shared product card (search results) ─────────────────────────────────────
+  function ProductCard({ product, currency, addToCart, startSale, lowStockThreshold, adding }) {
+    const isLowStock = product.quantity > 0 && product.quantity <= lowStockThreshold;
+    const isOut = product.quantity === 0;
+
+    return (
+      <motion.div
+        key={product.id}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
+          ${isOut ? "opacity-70 border-gray-100" : "border-gray-100 hover:shadow-md hover:border-[#03165A]/15"}`}
+      >
+        <div className={`h-1 w-full ${isOut ? "bg-red-400" : isLowStock ? "bg-amber-400" : "bg-gradient-to-r from-[#03165A] to-green-500"}`} />
+        <div className="relative">
+          <ProductImageCarousel images={[product.image, product.image2].filter(Boolean)} />
+          {isLowStock && !isOut && (
+            <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full animate-pulse">
+              Low · {product.quantity}
+            </span>
+          )}
+          {isOut && (
+            <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded-full">
+              Out of Stock
+            </span>
+          )}
+        </div>
+        <div className="p-3 space-y-2">
+          <h3 className="font-bold text-sm text-gray-900 dark:text-gray-300 line-clamp-1">{product.name}</h3>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-gray-400">Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"}`}>{product.quantity}</span></span>
+            <span className="font-black text-[#03165A] dark:text-gray-300">{currency.symbol}{product.sellingPrice.toLocaleString()}</span>
+          </div>
+          {isOut ? (
+            <div className="w-full text-center bg-red-50 text-red-500 border border-red-200 py-2 rounded-xl text-xs font-bold">Out of Stock</div>
+          ) : (
+            <div className="flex gap-2">
+              <button onClick={() => addToCart(product)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+                {adding === product.id ? (
+                  <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <><FaShoppingCart className="text-[10px]" /> Add</>
+                )}
+              </button>
+              <button onClick={() => startSale(product)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+                <FaMoneyBillWave className="text-[10px]" /> Sell
+              </button>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    );
+  }
+
+  // ── Search results view ─────────────────────────────────────────────────────
+  if (results.length > 0) {
     return (
       <DashboardLayout>
-        <div className="">
-
-          <h2 className="md:text-2xl text-lg font-semibold mb-4">Search Results</h2>
-
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-            {displayList.map((product) => {
-
-              const isLowStock = product.quantity > 0 && product.quantity <= lowStockThreshold;
-              const isOut = product.quantity === 0;
-
-              return (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`relative bg-white dark:bg-gray-800 rounded-xl shadow-md p-1 
-                              transition ${isOut ? "opacity-80" : "hover:shadow-lg"} cursor-pointer`}
-                >
-
-                  {/* 🔥 LOW STOCK WARNING */}
-                  {isLowStock && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 200 }}
-                      className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold 
-                      px-3 py-1 z-20 rounded-full shadow animate-pulse"
-                    >
-                      Low Stock ({product.quantity})
-                    </motion.div>
-                  )}
-
-                  {/* ❌ OUT OF STOCK ALERT */}
-                  {isOut && (
-                    <motion.div
-                      initial={{ y: -10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold 
-                      px-3 py-1 z-20 rounded-full shadow"
-                    >
-                      Out of Stock
-                    </motion.div>
-                  )}
-
-                  {/* PRODUCT IMAGE */}
-                  <div className="">
-                    <ProductImageCarousel
-                      images={[
-                        product.image,
-                        product.image2
-                      ].filter(Boolean)}
-                    />
-                  </div>
-
-                  <h3 className="md:text-lg text-sm font-semibold text-gray-900 dark:text-white line-clamp-1">
-                    {product.name}
-                  </h3>
-
-                  <div className="mt-1">
-                    <p className="md:text-sm text-xs mb-1">Quantity: {product.quantity}</p>
-                    <p className="text-sm font-semibold">{currency.symbol}{product.sellingPrice.toLocaleString()}</p>
-                  </div>
-
-                  {/* 🔘 BUTTONS OR OUT OF STOCK ALERT */}
-                  <div className="flex justify-between mt-1 flex-wrap gap-1">
-
-                    {isOut ? (
-                      // 🔴 Animated out of stock message
-                      <motion.div
-                        initial={{ scale: 0.8 }}
-                        animate={{ scale: 1 }}
-                        transition={{ repeat: Infinity, repeatType: "reverse", duration: 0.7 }}
-                        className="w-full text-center bg-red-600 text-white py-2 rounded-lg font-semibold"
-                      >
-                        Out of Stock
-                      </motion.div>
-                    ) : (
-                      <div className="w-full flex justify-between gap-2 ">
-                        <button
-                          onClick={() => addToCart(product)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
-                        >
-                          {adding === product.id ? (
-                            <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
-                          ) : (
-                            <><FaShoppingCart className="text-[10px]" /> Add</>
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => startSale(product)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
-                        >
-                          <FaMoneyBillWave /> Sell
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-bold text-[#03165A] dark:text-[#163bbf]">Search Results</h2>
+            <p className="text-sm text-gray-400 mt-0.5">{results.length} product{results.length !== 1 ? "s" : ""} found</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {results.map((p) => (
+              <ProductCard key={p.id} product={p} currency={currency}
+                addToCart={addToCart} startSale={startSale} lowStockThreshold={lowStockThreshold} adding={adding} />
+            ))}
           </div>
         </div>
-
         <SaleModal />
       </DashboardLayout>
-    )
+    );
   }
 
   return (
@@ -222,7 +185,7 @@ export default function Cart() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20, scale: 0.97 }}
                 transition={{ delay: index * 0.04, type: "spring", stiffness: 340, damping: 26 }}
-                className="group flex items-center gap-3 sm:gap-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#03165A]/15 transition-all p-4"
+                className="group flex items-center gap-3 sm:gap-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#03165A]/15 transition-all p-4"
               >
                 {/* Index badge */}
                 <div className="hidden sm:flex w-8 h-8 rounded-xl bg-[#03165A]/8 items-center justify-center flex-shrink-0">
@@ -231,7 +194,7 @@ export default function Cart() {
 
                 {/* Name + subtotal */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight line-clamp-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-300 text-sm sm:text-base leading-tight line-clamp-2">
                     {item.name}
                   </h3>
                   <p className="text-xs text-gray-400 mt-0.5">
@@ -256,7 +219,7 @@ export default function Cart() {
                       type="number"
                       value={editedPrices[item.id] ?? String(item.sellingPrice)}
                       onChange={(e) => updatePrice(item.id, e.target.value)}
-                      className="w-24 pl-6 pr-2 py-2 text-sm font-bold text-[#03165A] border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition"
+                      className="w-24 pl-6 pr-2 py-2 text-sm font-bold text-[#03165A] dark:text-gray-300 border border-gray-200 dark:border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-600 focus:bg-white focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition"
                     />
                   </div>
                   <p className="text-[10px] text-gray-300">tap to edit</p>
@@ -266,16 +229,16 @@ export default function Cart() {
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     onClick={() => decreaseQuantity(item.id)}
-                    className="w-7 h-7 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-blue-500 hover:text-white text-gray-500 transition-all active:scale-90"
+                    className="w-7 h-7 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-600 hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white text-gray-500 dark:text-gray-300 transition-all active:scale-90"
                   >
                     <FaMinus className="text-[9px]" />
                   </button>
-                  <span className="w-6 text-center text-sm font-bold text-gray-800">
+                  <span className="w-6 text-center text-sm font-bold text-gray-800 dark:text-gray-400">
                     {item.quantity}
                   </span>
                   <button
                     onClick={() => increaseQuantity(item.id)}
-                    className="w-7 h-7 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-blue-500 hover:text-white text-gray-500 transition-all active:scale-90"
+                    className="w-7 h-7 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-600 hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white text-gray-500 dark:text-gray-300 transition-all active:scale-90"
                   >
                     <FaPlus className="text-[9px]" />
                   </button>
@@ -284,7 +247,7 @@ export default function Cart() {
                 {/* Remove */}
                 <button
                   onClick={() => removeFromCart(item.id)}
-                  className="w-8 h-8 flex items-center justify-center rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all active:scale-90 flex-shrink-0 sm:group-hover:opacity-100"
+                  className="w-8 h-8 flex items-center justify-center rounded-xl text-gray-500 hover:bg-red-50 dark:hover:bg-gray-500 hover:text-red-500 transition-all active:scale-90 flex-shrink-0 sm:group-hover:opacity-100"
                 >
                   <FaTrash className="text-xs" />
                 </button>
@@ -296,10 +259,10 @@ export default function Cart() {
         {/* ── STICKY TOTAL FOOTER ── */}
         {cartItems.length > 0 && (
           <div className="sticky bottom-4 z-10">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/80 p-4 flex flex-wrap gap-2 items-center justify-between">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-500 shadow-xl shadow-gray-200/80 p-4 flex flex-wrap gap-2 items-center justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total</p>
-                <p className="text-2xl font-black text-[#03165A]">
+                <p className="text-2xl font-black text-[#03165A] dark:text-gray-300">
                   {currency.symbol}{totalAmount.toLocaleString()}
                 </p>
               </div>
