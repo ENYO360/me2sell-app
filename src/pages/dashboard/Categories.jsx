@@ -33,7 +33,7 @@ function ProductCard({ p, currency, addToCart, startSale, lowStockThreshold, add
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       className={`relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
-        ${isOut ? "opacity-70 border-gray-100 dark:border-gray-500" : "border-gray-100 dark:border-gray-600 hover:shadow-md hover:border-[#03165A]/15"}`}
+        ${isOut ? "opacity-70 border-red-600 dark:border-gray-500" : "border-gray-100 dark:border-gray-600 hover:shadow-md hover:border-[#03165A]/15"}`}
     >
       <div className={`h-1 w-full ${isOut ? "bg-red-400" : isLowStock ? "bg-amber-400" : "bg-gradient-to-r from-[#03165A] to-green-500"}`} />
 
@@ -107,7 +107,7 @@ function Modal({ open, onClose, children }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full sm:max-w-md bg-white sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl"
+        className="relative w-full sm:max-w-md bg-white dark:bg-gray-700 sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl"
         style={{
           transform: visible ? "translateY(0) scale(1)" : "translateY(40px) scale(0.97)",
           opacity: visible ? 1 : 0,
@@ -285,13 +285,13 @@ export default function Categories() {
             <div className="flex items-center gap-3 min-w-0">
               <button
                 onClick={() => setActiveCategory(null)}
-                className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-[#03165A] transition shadow-sm flex-shrink-0"
+                className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-[#03165A] dark:text-gray-300 dark:hover:bg-gray-600 transition shadow-sm flex-shrink-0"
               >
                 <FaArrowLeft className="text-sm" />
               </button>
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Category</p>
-                <h1 className="text-xl sm:text-2xl font-bold text-[#03165A] truncate">{activeCategory.name}</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-[#03165A] dark:text-[#163bbf] truncate">{activeCategory.name}</h1>
               </div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -302,7 +302,7 @@ export default function Categories() {
                   setInitialEditData(initial);
                   setShowEditModal(true);
                 }}
-                className="px-4 py-2 rounded-xl border-2 border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition"
+                className="px-4 py-2 rounded-xl border-2 border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-400 transition"
               >
                 Edit
               </button>
@@ -336,17 +336,17 @@ export default function Categories() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.04, type: "spring", stiffness: 340, damping: 26 }}
                     onClick={() => setActiveCategory(cat)}
-                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#03165A]/15 transition-all cursor-pointer overflow-hidden"
+                    className="group bg-white dark:bg-gray-700 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#03165A]/15 transition-all cursor-pointer overflow-hidden"
                   >
                     <div className="h-1 w-full bg-gradient-to-r from-[#03165A] to-green-500" />
 
                     <div className="p-4 space-y-3">
                       <div className="flex items-start gap-3">
                         <div className="w-9 h-9 rounded-xl bg-blue-500/8 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/12 transition">
-                          <FaTag className="text-[#03165A] text-sm" />
+                          <FaTag className="text-[#03165A] dark:text-[#163bbf] text-sm" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-bold text-gray-900 text-sm sm:text-base line-clamp-1">{cat.name}</h3>
+                          <h3 className="font-bold text-gray-900 dark:text-gray-300 text-sm sm:text-base line-clamp-1">{cat.name}</h3>
                           <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">
                             {cat.description || "No description"}
                           </p>
@@ -354,9 +354,9 @@ export default function Categories() {
                       </div>
 
                       <div className="flex items-end justify-between pt-1">
-                        <div className="bg-blue-500/[0.05] rounded-xl px-3 py-2 text-center">
+                        <div className="bg-blue-500/[0.05] dark:bg-gray-600 rounded-xl px-3 py-2 text-center">
                           <p className="text-[10px] text-gray-400 uppercase tracking-widest">Products</p>
-                          <p className="text-xl font-black text-[#03165A] mt-0.5">{categoryCounts[cat.id] ?? 0}</p>
+                          <p className="text-xl font-black text-[#03165A] dark:text-[#163bbf] mt-0.5">{categoryCounts[cat.id] ?? 0}</p>
                         </div>
                         {cat.createdAt?.toDate && (
                           <p className="text-[10px] text-gray-300 text-right leading-tight">
@@ -377,21 +377,21 @@ export default function Categories() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
 
             {/* Info card */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-gray-700 rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="h-1.5 bg-gradient-to-r from-[#03165A] via-[#0d6b4e] to-green-500" />
               <div className="p-5 space-y-4">
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                   {activeCategory.description || "No description provided."}
                 </p>
                 <div className="flex gap-4 flex-wrap">
-                  <div className="bg-blue-500/[0.04] rounded-xl px-4 py-3 text-center">
+                  <div className="bg-blue-500/[0.04] dark:bg-gray-600 rounded-xl px-4 py-3 text-center">
                     <p className="text-[10px] uppercase tracking-widest text-gray-400">Products</p>
-                    <p className="text-2xl font-black text-[#03165A] mt-0.5">{categoryCounts[activeCategory.id] ?? 0}</p>
+                    <p className="text-2xl font-black text-[#03165A] dark:text-[#163bbf] mt-0.5">{categoryCounts[activeCategory.id] ?? 0}</p>
                   </div>
                   {activeCategory.createdAt?.toDate && (
-                    <div className="bg-gray-50 rounded-xl px-4 py-3">
+                    <div className="bg-gray-50 dark:bg-gray-600 rounded-xl px-4 py-3">
                       <p className="text-[10px] uppercase tracking-widest text-gray-400">Created</p>
-                      <p className="text-sm font-semibold text-gray-700 mt-0.5">
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-400 mt-0.5">
                         {activeCategory.createdAt.toDate().toLocaleDateString()}
                       </p>
                     </div>
@@ -428,11 +428,11 @@ export default function Categories() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-green-600 mb-0.5">New</p>
-                <h3 className="text-2xl font-bold text-[#03165A]">Add Category</h3>
+                <h3 className="text-2xl font-bold text-[#03165A] dark:text-[#163bbf]">Add Category</h3>
               </div>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 transition"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-400 dark:text-gray-300 transition"
               >
                 <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
                   <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -446,7 +446,7 @@ export default function Categories() {
                 <select
                   value={newCategory.name}
                   onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition"
+                  className="w-full px-4 py-2.5 text-sm dark:text-gray-300 border border-gray-200 dark:border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-600 focus:bg-white dark:focus:bg-gray-700 focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition"
                 >
                   <option value="" disabled>Select a category…</option>
                   {MARKETPLACE_CATEGORIES.filter((c) => c.id !== "all").map((c) => (
@@ -464,7 +464,7 @@ export default function Categories() {
                   rows={3}
                   value={newCategory.description}
                   onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition resize-none"
+                  className="w-full px-4 py-2.5 text-sm dark:text-gray-300 border border-gray-200 dark:border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-600 focus:bg-white dark:focus:bg-gray-700 focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition resize-none"
                 />
               </div>
             </div>
@@ -474,7 +474,7 @@ export default function Categories() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 active:scale-95 transition-all"
+                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-400  active:scale-95 transition-all"
               >
                 Cancel
               </button>
@@ -499,11 +499,11 @@ export default function Categories() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-green-600 mb-0.5">Edit</p>
-                <h3 className="text-2xl font-bold text-[#03165A]">Edit Category</h3>
+                <h3 className="text-2xl font-bold text-[#03165A] dark:text-[#163bbf]">Edit Category</h3>
               </div>
               <button
                 onClick={() => setShowEditModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 transition"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-400 dark:text-gray-300 transition"
               >
                 <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
                   <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -513,11 +513,11 @@ export default function Categories() {
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-gray-400">Category</label>
+                <label className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-300  ">Category</label>
                 <select
                   value={editData.name}
                   onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition"
+                  className="w-full px-4 py-2.5 text-sm dark:text-gray-300 border border-gray-200 dark:border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-600 focus:bg-white dark:focus:bg-gray-700 focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition"
                 >
                   <option value="" disabled>Select a category…</option>
                   {MARKETPLACE_CATEGORIES.filter((c) => c.id !== "all").map((c) => (
@@ -532,7 +532,7 @@ export default function Categories() {
                   rows={3}
                   value={editData.description}
                   onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition resize-none"
+                  className="w-full px-4 py-2.5 text-sm dark:text-gray-300 border border-gray-200 dark:border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-600 focus:bg-white dark:focus:bg-gray-700 focus:border-[#03165A]/40 focus:ring-2 focus:ring-[#03165A]/10 outline-none transition resize-none"
                 />
               </div>
             </div>
@@ -542,7 +542,7 @@ export default function Categories() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 active:scale-95 transition-all"
+                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-400 active:scale-95 transition-all"
               >
                 Cancel
               </button>

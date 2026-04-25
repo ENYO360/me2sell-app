@@ -54,9 +54,9 @@ export default function DashboardHome() {
         {!isSearching && !loading && totalProducts > 0 && (
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "In Stock", value: inStockCount, color: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
-              { label: "Low Stock", value: lowStockCount, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
-              { label: "Out of Stock", value: outOfStockCount, color: "text-red-500", bg: "bg-red-50", border: "border-red-100" },
+              { label: "In Stock", value: inStockCount, color: "text-green-600", bg: "bg-green-50", border: "border-green-100 dark:border-green-500" },
+              { label: "Low Stock", value: lowStockCount, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100 dark:border-amber-500" },
+              { label: "Out of Stock", value: outOfStockCount, color: "text-red-500", bg: "bg-red-50", border: "border-red-100 dark:border-red-500" },
             ].map(({ label, value, color, bg, border }) => (
               <div key={label} className={`${bg} border ${border} dark:bg-gray-700 rounded-2xl px-4 py-3 text-center`}>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{label}</p>
@@ -120,8 +120,8 @@ export default function DashboardHome() {
                   transition={{ delay: Math.min(index * 0.03, 0.3), type: "spring", stiffness: 340, damping: 26 }}
                   className={`group relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
                     ${isOut
-                      ? "opacity-70 border-gray-100"
-                      : "border-gray-100 hover:shadow-md hover:border-[#03165A]/15"
+                      ? "opacity-70 border-red-600"
+                      : "border-gray-100 dark:border-gray-500 hover:shadow-md hover:border-[#03165A]/15"
                     }`}
                 >
                   {/* Accent bar */}
@@ -174,7 +174,7 @@ export default function DashboardHome() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => addToCart(product)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl dark:border hover:text-sm text-gray-800 dark:text-gray-400  text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl dark:border dark:border-gray-500 hover:text-sm text-gray-800 dark:text-gray-400  text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
                         >
                           {adding === product.id ? (
                             <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
@@ -185,7 +185,7 @@ export default function DashboardHome() {
 
                         <button
                           onClick={() => startSale(product)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm dark:text-gray-400 dark:border text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl hover:text-sm dark:text-gray-400 dark:border dark:border-gray-500 text-gray-800 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20"
                         >
                           <FaCashRegister className="text-[10px]" /> Sell
                         </button>

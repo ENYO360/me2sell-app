@@ -530,15 +530,15 @@ export default function Products() {
 
                     {/* Meta row */}
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-gray-50 dark:bg-gray-400 rounded-xl px-3 py-2">
-                        <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-wider">Qty</p>
+                      <div className="bg-gray-50 dark:bg-gray-600 rounded-xl px-3 py-2">
+                        <p className="text-[10px] text-gray-400 dark:text-gray-300 uppercase tracking-wider">Qty</p>
                         <p className={`text-sm font-bold mt-0.5 ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-800 dark:text-gray-300"
                           }`}>
                           {p.quantity}
                         </p>
                       </div>
-                      <div className="bg-gray-50 dark:bg-gray-400 rounded-xl px-3 py-2">
-                        <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-wider">Category</p>
+                      <div className="bg-gray-50 dark:bg-gray-600 rounded-xl px-3 py-2">
+                        <p className="text-[10px] text-gray-400 dark:text-gray-300 uppercase tracking-wider">Category</p>
                         <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-0.5 truncate">
                           {p.category || "—"}
                         </p>

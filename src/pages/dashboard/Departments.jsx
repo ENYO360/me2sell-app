@@ -150,7 +150,7 @@ export default function Departments() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         className={`relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
-          ${isOut ? "opacity-70 border-gray-100" : "border-gray-100 dark:border-gray-500 hover:shadow-md hover:border-[#03165A]/15"}`}
+          ${isOut ? "opacity-70 border-red-600" : "border-gray-100 dark:border-gray-500 hover:shadow-md hover:border-[#03165A]/15"}`}
       >
         {/* accent bar */}
         <div className={`h-1 w-full ${isOut ? "bg-red-400" : isLowStock ? "bg-amber-400" : "bg-gradient-to-r from-[#03165A] to-green-500"}`} />

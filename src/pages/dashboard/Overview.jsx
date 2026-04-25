@@ -28,7 +28,7 @@ function ProductCard({ product, currency, addToCart, startSale, lowStockThreshol
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       className={`relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
-        ${isOut ? "opacity-70 border-gray-100" : "border-gray-100 hover:shadow-md hover:border-[#03165A]/15"}`}
+        ${isOut ? "opacity-70 border-red-600" : "border-gray-100 dark:border-gray-500 hover:shadow-md hover:border-[#03165A]/15"}`}
     >
       <div className={`h-1 w-full ${isOut ? "bg-red-400" : isLowStock ? "bg-amber-400" : "bg-gradient-to-r from-[#03165A] to-green-500"}`} />
       <div className="relative">
@@ -55,7 +55,7 @@ function ProductCard({ product, currency, addToCart, startSale, lowStockThreshol
         ) : (
           <div className="flex gap-2">
             <button onClick={() => addToCart(product)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border dark:border-gray-500 rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
               {adding === product.id ? (
                 <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
               ) : (
@@ -63,7 +63,7 @@ function ProductCard({ product, currency, addToCart, startSale, lowStockThreshol
               )}
             </button>
             <button onClick={() => startSale(product)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border dark:border-gray-500 rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
               <FaMoneyBillWave className="text-[10px]" /> Sell
             </button>
           </div>
@@ -269,7 +269,7 @@ export default function Overview() {
             <div className="h-1 w-full bg-gradient-to-r from-[#03165A] to-purple-500" />
             <div className="p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Top Product</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Top Selling Product</p>
                 <div className="w-8 h-8 rounded-xl bg-blue-500/8 flex dark:bg-blue-900 items-center justify-center">
                   <FaTrophy className="text-[#03165A] dark:text-[#1744e9] text-sm" />
                 </div>
@@ -281,6 +281,10 @@ export default function Overview() {
                   <p className="font-bold text-gray-900 dark:text-gray-400 text-base leading-tight line-clamp-2">{dashboard.topProduct.name}</p>
                   <p className="text-xs text-gray-500">Sold: <span className="font-semibold text-gray-700">{dashboard.topProduct.quantity}</span></p>
                   <p className="text-lg font-bold text-green-600">{currency?.symbol}{Number(dashboard.topProduct.revenue).toLocaleString()}</p>
+                  <p className="text-3xl font-black text-gray-900">&nbsp;</p>
+                  <p className="text-[10px] text-gray-700 dark:text-gray-400 uppercase tracking-wider">
+                    {customMode ? "Custom range" : RANGES.find((r) => r.value === filters.salesRange)?.label}
+                  </p>
                 </>
               )}
             </div>

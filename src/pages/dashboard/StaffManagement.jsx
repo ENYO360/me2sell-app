@@ -819,7 +819,7 @@ export default function StaffManagement() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         className={`relative bg-white dark:bg-gray-800 rounded-2xl border overflow-hidden shadow-sm transition-all
-          ${isOut ? "opacity-70 border-gray-100" : "border-gray-100 hover:shadow-md hover:border-[#03165A]/15"}`}
+          ${isOut ? "opacity-70 border-red-600" : "border-gray-100 dark:border-gray-500 hover:shadow-md hover:border-[#03165A]/15"}`}
       >
         <div className={`h-1 w-full ${isOut ? "bg-red-400" : isLowStock ? "bg-amber-400" : "bg-gradient-to-r from-[#03165A] to-green-500"}`} />
         <div className="relative">
@@ -846,7 +846,7 @@ export default function StaffManagement() {
           ) : (
             <div className="flex gap-2">
               <button onClick={() => addToCart(product)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border dark:border-gray-500  rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
                 {adding === product.id ? (
                   <span className="w-3.5 h-3.5 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
                 ) : (
@@ -854,7 +854,7 @@ export default function StaffManagement() {
                 )}
               </button>
               <button onClick={() => startSale(product)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 dark:border dark:border-gray-500 rounded-xl hover:text-sm text-gray-800 dark:text-gray-400 text-xs font-bold transition active:scale-95 shadow-sm shadow-[#03165A]/20">
                 <FaMoneyBillWave className="text-[10px]" /> Sell
               </button>
             </div>
