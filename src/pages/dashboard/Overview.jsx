@@ -281,7 +281,7 @@ export default function Overview() {
                   <p className="font-bold text-gray-900 dark:text-gray-400 text-base leading-tight line-clamp-2">{dashboard.topProduct.name}</p>
                   <p className="text-xs text-gray-500">Sold: <span className="font-semibold text-gray-700">{dashboard.topProduct.quantity}</span></p>
                   <p className="text-lg font-bold text-green-600">{currency?.symbol}{Number(dashboard.topProduct.revenue).toLocaleString()}</p>
-                  <p className="text-3xl font-black text-gray-900">&nbsp;</p>
+
                   <p className="text-[10px] text-gray-700 dark:text-gray-400 uppercase tracking-wider">
                     {customMode ? "Custom range" : RANGES.find((r) => r.value === filters.salesRange)?.label}
                   </p>

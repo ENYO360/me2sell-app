@@ -713,7 +713,7 @@ export default function Landing() {
       </header>
 
       {/* ── MAIN CONTENT ── */}
-      <main className="relative z-10 flex-1 pt-24">
+      <main className="relative z-10 flex-1 pt-5 md:pt-16">
         <AnimatePresence mode="wait">
           {isBuyer ? (
             <motion.div key="buyer" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
