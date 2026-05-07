@@ -29,6 +29,7 @@ export default function Cart() {
 
   const [editedPrices, setEditedPrices] = useState({});
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [paymentMode, setPaymentMode] = useState("Cash");
   const { setScope, results } = useSearch();
 
   // Calculate total
@@ -37,6 +38,10 @@ export default function Cart() {
     const price = Number(rawPrice) || 0;
     return sum + price * item.quantity;
   }, 0);
+
+  useEffect(() => {
+    setPaymentMode("Cash")
+  }, []);
 
   // Handle price edit
   const updatePrice = (id, value) => {
@@ -355,6 +360,34 @@ export default function Cart() {
                   {/* Divider */}
                   <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
+                  {/* ── Payment Mode ── */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+                      Payment Method
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: "Cash", label: "Cash", icon: "💵" },
+                        { value: "POS", label: "POS", icon: "💳" },
+                        { value: "Transfer", label: "Transfer", icon: "🏦" },
+                      ].map(({ value, label, icon }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setPaymentMode(value)}
+                          className={`flex flex-col items-center gap-1 py-3 rounded-2xl border-2 text-sm font-semibold transition-all
+                              ${paymentMode === value
+                              ? "border-[#03165A] bg-[#03165A]/5 text-[#03165A] dark:border-[#163bbf] dark:text-[#163bbf]"
+                              : "border-gray-200 dark:border-gray-600 text-gray-400 hover:border-gray-300"
+                            }`}
+                        >
+                          <span className="text-lg">{icon}</span>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Actions */}
                   <div className="flex gap-3">
                     <button
@@ -372,7 +405,7 @@ export default function Cart() {
                         });
 
                         try {
-                          const success = await checkoutCart(numericPrices);
+                          const success = await checkoutCart(paymentMode, numericPrices);
 
                           if (success) {
                             setCheckoutOpen(false); // close ONLY if successful

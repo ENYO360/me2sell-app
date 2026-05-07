@@ -36,7 +36,7 @@ export default function Support() {
                     {/* Logo */}
                     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
                         <Link to="/" className="flex items-center gap-2">
-                            <img src={Logo} alt="Me2sell Logo" className="w-12" />
+                            <img src={Logo} alt="Me2sell Logo" className="w-16 md:w-24" />
                         </Link>
                     </motion.div>
 

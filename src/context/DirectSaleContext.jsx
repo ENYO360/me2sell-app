@@ -110,7 +110,7 @@ export const DirectSaleProvider = ({ children }) => {
        - Stats ALSO written to staffDashboardStats/{staffUid}/daily/{date}
          when the seller is a staff member
     ───────────────────────────────────────── */
-    const confirmSale = async (editedPrice) => {
+    const confirmSale = async (editedPrice, paymentMode = "Cash") => {
         if (!selectedProduct) return;
         if (!user) return;
         if (!ownerId) {
@@ -192,6 +192,7 @@ export const DirectSaleProvider = ({ children }) => {
                     totalAmount: editedPrice,
                     totalProfit: profit,
                     totalQuantity: 1,
+                    paymentMode,
                     createdAt: serverTimestamp(),
                 });
 

@@ -941,6 +941,10 @@ export default function SalesHistory() {
                                   )}
                                 </div>
 
+                                <div>
+                                  Paid by: <span className="font-semibold">{sale.paymentMode || ""}</span>
+                                </div>
+
                                 {/* ── Generate Receipt button ── */}
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setPendingSale(sale); }}

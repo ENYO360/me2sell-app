@@ -10,6 +10,7 @@ export default function SaleModal() {
   const [price, setPrice] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [paymentMode, setPaymentMode] = useState("Cash");
   const priceInputRef = useRef(null);
   const { currency } = useCurrency();
 
@@ -23,7 +24,9 @@ export default function SaleModal() {
   }, [isSaleModalOpen]);
 
   useEffect(() => {
-    if (selectedProduct) setPrice(selectedProduct.sellingPrice);
+    if (selectedProduct)
+      setPrice(selectedProduct.sellingPrice);
+    setPaymentMode("Cash");
   }, [selectedProduct]);
 
   useEffect(() => {
@@ -33,15 +36,15 @@ export default function SaleModal() {
   if (!isSaleModalOpen || !selectedProduct) return null;
 
   const originalPrice = selectedProduct.sellingPrice;
-  const currentPrice  = Number(price) || 0;
-  const discount      = originalPrice > 0
+  const currentPrice = Number(price) || 0;
+  const discount = originalPrice > 0
     ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
     : 0;
-  const isDiscounted  = discount > 0;
-  const isMarkedUp    = discount < 0;
+  const isDiscounted = discount > 0;
+  const isMarkedUp = discount < 0;
 
-  const handleConfirm = () => confirmSale(currentPrice);
-  const commitEdit    = () => { if (price === "" || isNaN(price)) setPrice("0"); setIsEditing(false); };
+  const handleConfirm = () => confirmSale(currentPrice, paymentMode);
+  const commitEdit = () => { if (price === "" || isNaN(price)) setPrice("0"); setIsEditing(false); };
 
   return (
     <div
@@ -90,7 +93,7 @@ export default function SaleModal() {
               className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-200 transition -mt-1"
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </button>
           </div>
@@ -107,7 +110,7 @@ export default function SaleModal() {
                   className="text-[11px] font-semibold text-[#03165A] dark:text-[#163bbf] hover:text-[#FA212F] transition flex items-center gap-1"
                 >
                   <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/>
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z" />
                   </svg>
                   Edit
                 </button>
@@ -131,7 +134,7 @@ export default function SaleModal() {
                 {isDiscounted && (
                   <span className="absolute right-4 inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
                     <svg width="8" height="8" viewBox="0 0 10 10" fill="currentColor">
-                      <path d="M5 1l1.5 3h3l-2.5 2 1 3L5 7.5 3 9l1-3L1.5 4h3z"/>
+                      <path d="M5 1l1.5 3h3l-2.5 2 1 3L5 7.5 3 9l1-3L1.5 4h3z" />
                     </svg>
                     {discount}% off
                   </span>
@@ -165,9 +168,37 @@ export default function SaleModal() {
               <p className="text-xs text-gray-400 pl-1">
                 Original: {currency.symbol}{Number(originalPrice).toLocaleString()}
                 {isDiscounted && <span className="text-green-600 ml-1">— selling below cost</span>}
-                {isMarkedUp   && <span className="text-amber-600 ml-1">— marked up</span>}
+                {isMarkedUp && <span className="text-amber-600 ml-1">— marked up</span>}
               </p>
             )}
+          </div>
+
+          {/* ── Payment Mode ── */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+              Payment Method
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: "Cash", label: "Cash", icon: "💵" },
+                { value: "POS", label: "POS", icon: "💳" },
+                { value: "Transfer", label: "Transfer", icon: "🏦" },
+              ].map(({ value, label, icon }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setPaymentMode(value)}
+                  className={`flex flex-col items-center gap-1 py-3 rounded-2xl border-2 text-sm font-semibold transition-all
+                      ${paymentMode === value
+                      ? "border-[#03165A] bg-[#03165A]/5 text-[#03165A] dark:border-[#163bbf] dark:text-[#163bbf]"
+                      : "border-gray-200 dark:border-gray-600 text-gray-400 hover:border-gray-300"
+                    }`}
+                >
+                  <span className="text-lg">{icon}</span>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* ── Divider ── */}
@@ -195,7 +226,7 @@ export default function SaleModal() {
               ) : (
                 <span className="flex items-center justify-center gap-2">
                   <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                   Confirm Sale
                 </span>

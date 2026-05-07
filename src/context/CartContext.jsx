@@ -216,7 +216,7 @@ export const CartProvider = ({ children }) => {
        - soldBy = logged-in user UID (admin or staff)
        - Stats updated under OWNER's dashboardStats
     ───────────────────────────────────────── */
-    const checkoutCart = async (editedPrices = {}) => {
+    const checkoutCart = async (paymentMode = "Cash", editedPrices = {}) => {
         if (!user) return alert("Login first.");
         if (cartItems.length === 0) return alert("Cart is empty.");
         if (!ownerId) return alert("Could not resolve business owner. Try again.");
@@ -303,6 +303,7 @@ export const CartProvider = ({ children }) => {
                     totalAmount,
                     totalProfit,
                     totalQuantity,
+                    paymentMode,
                     createdAt: serverTimestamp(),
                 });
 
