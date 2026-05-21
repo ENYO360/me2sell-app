@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 
 const MetaContext = createContext();

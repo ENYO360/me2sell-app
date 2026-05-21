@@ -774,10 +774,6 @@ export default function SellerProfile() {
                                                 {[seller.address, seller.country].filter(Boolean).join(", ")}
                                             </span>
                                         )}
-                                        <span className="flex items-center gap-1">
-                                            <FaTag size={9} className="text-green-600" />
-                                            {sellerProducts.length} product{sellerProducts.length !== 1 ? "s" : ""}
-                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -824,9 +820,6 @@ export default function SellerProfile() {
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-base font-bold text-gray-900 dark:text-white">
                         Products
-                        <span className="ml-2 text-sm font-normal text-gray-400">
-                            ({filteredProducts.length}{searchQuery ? " matching" : ""})
-                        </span>
                     </h2>
                 </div>
 

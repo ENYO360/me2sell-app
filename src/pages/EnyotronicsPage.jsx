@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { auth } from "../firebase/config";
-import { FaTools, FaCode, FaLaptopCode, FaRocket, FaPhone, FaEnvelope, FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { FaTools, FaCode, FaLaptopCode, FaRocket, FaPhone, FaEnvelope, FaFacebookF, FaInstagram, FaLinkedinIn, FaGlobe } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import Logo from "../images/sales-book.png";
@@ -141,6 +141,10 @@ export default function EnyotronicsPage() {
                             <motion.a whileHover={{ scale: 1.05 }} href="mailto:enyotronics@gmail.com" className="flex items-center gap-3 bg-white dark:bg-gray-700 p-4 rounded-xl shadow w-full md:w-auto">
                                 <FaEnvelope className="text-green-600" />
                                 <span>Email Me</span>
+                            </motion.a>
+                            <motion.a whileHover={{ scale: 1.05 }} href="https://shaibumoses-portfolio.netlify.app/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-white dark:bg-gray-700 p-4 rounded-xl shadow w-full md:w-auto">
+                                <FaGlobe className="text-blue-600" />
+                                <span>My Portfolio</span>
                             </motion.a>
                         </div>
                     </div>

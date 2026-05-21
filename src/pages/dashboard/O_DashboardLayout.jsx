@@ -12,7 +12,7 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { HiBuildingOffice2 } from "react-icons/hi2";
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
-import { MdSell } from "react-icons/md";
+import { MdSell, MdViewKanban } from "react-icons/md";
 import Logo from "../../images/me2sell-logo.png";
 import EnyotronicsLogo from "../../images/enyotronics-logo.png";
 import SearchBar from "./SearchBar";
@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }) {
 
     const navItems = [
         { to: "/dashboard", icon: <FaHome />, label: "Home" },
-        { to: "/dashboard/overview", icon: <FaHome />, label: "Overview" },
+        { to: "/dashboard/overview", icon: <MdViewKanban />, label: "Overview" },
         { to: "/dashboard/products", icon: <FaBox />, label: "Products" },
         { to: "/dashboard/cart", icon: <FaShoppingCart />, label: "Cart" },
         { to: "/dashboard/sales-history", icon: <FaHistory />, label: "Sales History" },
