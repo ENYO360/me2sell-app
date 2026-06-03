@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import { useMarketplace } from "../../context/MarketPlaceContext";
-import LOgo from "../../images/me2sell-logo.png";
+import Logo from "../../images/me2sell-logo.png";
 import EnyotronicsLogo from "../../images/enyotronics-logo.png";
 import {
     FaSearch, FaWhatsapp, FaPhoneAlt, FaBars, FaMoon, FaSun,
@@ -836,7 +836,7 @@ export default function BuyerMarketplace({ categories = [] }) {
 
                     {/* Logo */}
                     <Link to="/" className="shrink-0 hidden md:block">
-                        <img src={LOgo} alt="Me2Sell" className="h-8 w-auto" />
+                        <img src={Logo} alt="Me2Sell" className="h-8 w-auto" />
                     </Link>
 
                     {/* Search bar */}
@@ -1106,7 +1106,7 @@ export default function BuyerMarketplace({ categories = [] }) {
                         >
                             <div className="flex items-center justify-between p-4 border-b dark:border-gray-800">
                                 <Link to="/">
-                                    <img src={LOgo} alt="logo" className="w-24" />
+                                    <img src={Logo} alt="logo" className="w-24" />
                                 </Link>
                                 <div className="flex items-center gap-2">
                                     <button onClick={toggleTheme}

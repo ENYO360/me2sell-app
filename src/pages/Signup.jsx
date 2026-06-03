@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase/config";
 import { doc, setDoc } from "firebase/firestore";
+import { logEvent, analytics } from "../firebase/config";
 import ThemeToggle from "../components/ThemeToggle";
 import CountrySelect from "./dashboard/CountrySelect";
 import { FaEye } from "react-icons/fa";
@@ -42,6 +43,8 @@ const Signup = () => {
         email,
         createdAt: new Date(),
       });
+
+      logEvent(analytics, "sign_up", { method: "email" });
 
       navigate("/setup-profile");
     } catch (error) {
