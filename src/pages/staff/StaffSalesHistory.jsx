@@ -824,7 +824,7 @@ export default function StaffSalesHistory() {
                                                                              text-blue-600 dark:text-blue-400
                                                                              bg-blue-50 dark:bg-blue-900/30
                                                                              px-2 py-1 rounded-lg">
-                                                                {(sale.saleId || sale.id)?.toUpperCase()}
+                                                                {(sale.saleId || sale.id)}
                                                             </span>
                                                         </div>
 
@@ -868,9 +868,11 @@ export default function StaffSalesHistory() {
                                                                              text-gray-700 dark:text-gray-300">
                                                                 Total
                                                             </span>
+                                                            
                                                             <span className="text-base font-black
                                                                              text-green-600 dark:text-green-400">
                                                                 {currency.symbol}{sale.totalAmount?.toLocaleString()}
+                                                                <p className="text-xs font-normal text-blue-600">Paid with: {sale.paymentMode || ""}</p>
                                                             </span>
                                                         </div>
 

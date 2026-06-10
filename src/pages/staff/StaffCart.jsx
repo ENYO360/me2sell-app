@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import StaffDashboardLayout from "./StaffDashboardLayout";
 import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
@@ -33,11 +33,16 @@ export default function StaffCart() {
 
   const [editedPrices, setEditedPrices] = useState({});
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [paymentMode, setPaymentMode] = useState("Cash");
 
   const totalAmount = cartItems.reduce((sum, item) => {
     const price = Number(editedPrices[item.id] ?? item.sellingPrice) || 0;
     return sum + price * item.quantity;
   }, 0);
+
+    useEffect(() => {
+      setPaymentMode("Cash")
+    }, []);
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -334,6 +339,34 @@ export default function StaffCart() {
                   </span>
                 </div>
 
+                {/* ── Payment Mode ── */}
+                <div className="space-y-2 mb-6">
+                  <label className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+                    Payment Method
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "Cash", label: "Cash", icon: "💵" },
+                      { value: "POS", label: "POS", icon: "💳" },
+                      { value: "Transfer", label: "Transfer", icon: "🏦" },
+                    ].map(({ value, label, icon }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setPaymentMode(value)}
+                        className={`flex flex-col items-center gap-1 py-3 rounded-2xl border-2 text-sm font-semibold transition-all
+                              ${paymentMode === value
+                            ? "border-[#03165A] bg-[#03165A]/5 text-[#03165A] dark:border-[#163bbf] dark:text-[#163bbf]"
+                            : "border-gray-200 dark:border-gray-600 text-gray-400 hover:border-gray-300"
+                          }`}
+                      >
+                        <span className="text-lg">{icon}</span>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Action buttons */}
                 <div className="flex gap-3">
                   <button
@@ -348,30 +381,30 @@ export default function StaffCart() {
                   <motion.button
                     whileTap={{ scale: 0.97 }}
                     onClick={async () => {
-                        const numericPrices = {};
-                        Object.keys(editedPrices).forEach((id) => {
-                          numericPrices[id] = Number(editedPrices[id]) || 0;
-                        });
+                      const numericPrices = {};
+                      Object.keys(editedPrices).forEach((id) => {
+                        numericPrices[id] = Number(editedPrices[id]) || 0;
+                      });
 
-                        try {
-                          const success = await checkoutCart(numericPrices);
+                      try {
+                        const success = await checkoutCart(paymentMode, numericPrices);
 
-                          if (success) {
-                            setCheckoutOpen(false); // close ONLY if successful
-                          }
-                        } catch (error) {
-                          console.error("Checkout failed:", error);
-                          // optionally show error message
+                        if (success) {
+                          setCheckoutOpen(false); // close ONLY if successful
                         }
-                      }}
+                      } catch (error) {
+                        console.error("Checkout failed:", error);
+                        // optionally show error message
+                      }
+                    }}
                     disabled={confirming}
                     className={`flex-1 py-3 rounded-xl font-semibold text-sm
                                 text-white flex items-center justify-center gap-2
                                 transition-colors
                                 ${confirming
-                                  ? "bg-green-400 cursor-not-allowed"
-                                  : "bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20"
-                                }`}
+                        ? "bg-green-400 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20"
+                      }`}
                   >
                     {confirming ? (
                       <>
