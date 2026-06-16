@@ -70,12 +70,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
-
-      {/* Theme toggle button */}
-      <div className="absolute top-6 right-6">
-        <ThemeToggle />
-      </div>
-
       <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-sm animate-fadeIn">
         <div className="flex justify-center my-4">
           <Link to="/"><img src={Logo} alt="Logo" className="w-24" /></Link>

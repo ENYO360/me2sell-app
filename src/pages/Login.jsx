@@ -221,11 +221,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 transition-colors">
-      {/* Theme toggle */}
-      <div className="absolute top-6 right-6">
-        <ThemeToggle />
-      </div>
-
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Logo */}
         <div className="flex justify-center pt-8 pb-4">

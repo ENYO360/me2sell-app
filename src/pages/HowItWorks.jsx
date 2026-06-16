@@ -139,15 +139,6 @@ export default function SalesBookGuide() {
                                 </p>
                             </div>
                         </div>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => window.print()}
-                                className="inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-2 rounded-lg shadow hover:scale-105 transition"
-                            >
-                                <FaPrint /> Print Guide
-                            </button>
-                        </div>
                     </motion.header>
 
                     {/* ─── VIDEO SECTION ─── */}
