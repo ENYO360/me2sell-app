@@ -13,7 +13,7 @@ export default function SalesBookGuide() {
         {
             id: "overview",
             title: "Overview; What Me2sell does",
-            body: `Me2sell is a lightweight Point-of-Sale and inventory management web app for small businesses.\n\nIt helps you add and categorize products, record quick sales (direct sales or cart checkout), manage stock, generate reports, and invite staff with custom permissions, all under a single business account.`
+            body: `Me2sell is a lightweight Point-of-Sale and inventory management web app for businesses.\n\nIt helps you add and categorize products, record quick sales (direct sales or cart checkout), manage stock, generate reports, and invite staff with custom permissions, all under a single business account.`
         },
         {
             id: "getting-started",
@@ -38,7 +38,7 @@ export default function SalesBookGuide() {
         {
             id: "staff",
             title: "Staff. Invite & manage access",
-            body: `The Admin can add staff under Business -> Staff. Each staff gets a 6-digit login code.\n- Admin chooses permissions for each staff (view-only or edit rights for products, sales, categories, etc.).\n- Staff login with the code (or use an assigned auth user).\n- Admin may regenerate codes, edit permissions or delete staff.`
+            body: `The Admin can add staff under Business -> Staff. Each staff gets a login email and password assigned by the admin.\n- Admin chooses permissions for each staff (view-only or edit rights for products, sales, categories, etc.).\n- Staff login with the credentials.\n- Admin may suspend, edit permissions or delete staff.`
         },
         {
             id: "reports",
@@ -53,7 +53,7 @@ export default function SalesBookGuide() {
         {
             id: "tips",
             title: "Best Practices & Tips",
-            body: `• Keep costPrice accurate so profit figures are correct.\n• Use departments + categories for better organization.\n• Regenerate staff codes if compromised.`
+            body: `• Keep costPrice accurate so profit figures are correct.\n• Use departments + categories for better organization.\n• Regenerate staff credentials if compromised.`
         }
     ];
 
@@ -149,6 +149,33 @@ export default function SalesBookGuide() {
                             </button>
                         </div>
                     </motion.header>
+
+                    {/* ─── VIDEO SECTION ─── */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden mb-8">
+                        {/* Card header */}
+                        <div className="bg-blue-600 px-4 py-3 flex items-center gap-3">
+                            <h2 className="text-white font-semibold text-sm md:text-lg">
+                                How to Set Up Your Account
+                            </h2>
+                        </div>
+
+                        {/* Video embed — native video tag works with Firebase Storage URLs */}
+                        <div className="w-full bg-gray-900">
+                            <video
+                                className="w-full block"
+                                style={{ maxHeight: "75vh" }}
+                                controls
+                                playsInline
+                                preload="metadata"
+                            >
+                                <source
+                                    src="https://firebasestorage.googleapis.com/v0/b/sales-book-d66c5.firebasestorage.app/o/me2sell_tutorial.mp4?alt=media&token=7cf61585-c26f-4cbb-a332-dd8dcb588714"
+                                    type="video/mp4"
+                                />
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
 
                     {/* Detailed accordion */}
                     <div className="space-y-4">
