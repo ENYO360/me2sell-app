@@ -12,7 +12,8 @@ import {
     FaChevronDown, FaChevronRight, FaStore, FaTag, FaBox
 } from "react-icons/fa";
 import { MdKeyboardArrowDown, MdGridView, MdClose } from "react-icons/md";
-import { auth } from "../../firebase/config";
+import { auth, db } from "../../firebase/config";
+import { getDoc, doc } from "firebase/firestore";
 import ProductImageCarousel from "../dashboard/ProductImageCarousel";
 
 /* ─────────────────────────────────────────────────────────────────
@@ -502,7 +503,7 @@ function ProductModal({ product, similarProducts, sellerProducts, cart, onAddToC
                             <h4 className="font-bold text-sm text-gray-800 dark:text-white flex items-center gap-2">
                                 <FaStore size={12} className="text-green-600" /> Seller
                             </h4>
-                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{product.businessName || "—"}</p>
+                            <Link to={`/seller/${product.sellerId}`} className="text-sm font-semibold text-gray-800 dark:text-gray-100 hover:text-blue-600 hover:border-b-2">{product.businessName || "—"}</Link>
                             {product.businessType && <p className="text-xs text-gray-400">{product.businessType}</p>}
                             {product.address && <p className="text-xs text-gray-500 dark:text-gray-400">{product.address}</p>}
 
@@ -624,6 +625,7 @@ const DESKTOP_NAV_COUNT = 8; // categories shown directly in desktop nav
 
 export default function BuyerMarketplace({ categories = [] }) {
     const [user, setUser] = useState(null);
+    const [profileId, setProfileId] = useState('')
     const [showMobileDrawer, setShowMobileDrawer] = useState(false);
     const [showMobileCategoryDropdown, setShowMobileCategoryDropdown] = useState(false);
     const [showAllCategoriesDropdown, setShowAllCategoriesDropdown] = useState(false);
@@ -664,8 +666,27 @@ export default function BuyerMarketplace({ categories = [] }) {
 
     // ── Auth ──────────────────────────────────────────────────────
     useEffect(() => {
-        const unsub = auth.onAuthStateChanged(u => setUser(u));
-        return () => unsub();
+        const unsubscribe = auth.onAuthStateChanged(async (u) => {
+            setUser(u);
+
+            if (u) {
+                try {
+                    const docRef = doc(db, "businessProfiles", u.uid);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        setProfileId(docSnap.id); // or u.uid
+                        console.log("Profile ID:", docSnap.id);
+                    } else {
+                        console.log("Business profile not found.");
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     // ── Deep-link: open product modal from ?product=ID ───────────────
@@ -826,7 +847,7 @@ export default function BuyerMarketplace({ categories = [] }) {
 
             {/* ── TOP NAVBAR ── */}
             <header className="sticky top-0 z-30 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-sm">
-                <div className="mx-auto px-3 py-10 md:px-6 h-14 flex items-center gap-2">
+                <div className="mx-auto px-3 py-10 md:px-6 h-14 flex items-center gap-1">
 
                     {/* Mobile hamburger */}
                     <button onClick={() => setShowMobileDrawer(true)}
@@ -861,7 +882,13 @@ export default function BuyerMarketplace({ categories = [] }) {
                         {user && (
                             <Link to="/dashboard"
                                 className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-green-600 transition px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
-                                <MdGridView size={16} /> My Stock
+                                <MdGridView size={16} /> My Business
+                            </Link>
+                        )}
+                        {user && (
+                            <Link Link to={`/seller/${profileId}`}
+                                className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-green-600 transition px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
+                                <FaStore size={12} className="text-green-600" /> My Profile
                             </Link>
                         )}
 
@@ -946,6 +973,43 @@ export default function BuyerMarketplace({ categories = [] }) {
                                     </AnimatePresence>
                                 </li>
                             )}
+                        </ul>
+                    </div>
+                </div>
+
+                {/* ── MOBILE CATEGORY NAV ───────────────────────── */}
+                <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+                    <div
+                        className="
+                        overflow-x-auto
+                        scrollbar-hide
+                        px-4
+                        py-2
+                        "
+                    >
+                        <ul className="flex items-center gap-2 w-max">
+                            {navCategories.map((cat) => (
+                                <li key={cat.id} className="flex-shrink-0">
+                                    <button
+                                        onClick={() => handleCategorySelect(cat.id)}
+                                        className={`
+                                        px-4 py-2
+                                        rounded-full
+                                        text-xs
+                                        font-medium
+                                        whitespace-nowrap
+                                        transition-all
+                                        duration-200
+                                        ${activeCategory === cat.id
+                                            ? "bg-green-600 text-white shadow-md"
+                                            : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                                                        }
+                                        `}
+                                    >
+                                        {cat.name}
+                                    </button>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
@@ -1154,6 +1218,12 @@ export default function BuyerMarketplace({ categories = [] }) {
                                         onClick={() => setShowMobileDrawer(false)}
                                         className="flex items-center gap-2 w-full p-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                         <MdGridView size={16} /> My Seller Account
+                                    </Link>
+                                )}
+                                {user && (
+                                    <Link Link to={`/seller/${profileId}`}
+                                        className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-green-600 transition px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
+                                        <FaStore size={12} className="text-green-600" /> My Profile
                                     </Link>
                                 )}
                             </div>
