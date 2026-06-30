@@ -626,6 +626,7 @@ const DESKTOP_NAV_COUNT = 8; // categories shown directly in desktop nav
 export default function BuyerMarketplace({ categories = [] }) {
     const [user, setUser] = useState(null);
     const [profileId, setProfileId] = useState('')
+    const [isStaff, setIsStaff] = useState(false)
     const [showMobileDrawer, setShowMobileDrawer] = useState(false);
     const [showMobileCategoryDropdown, setShowMobileCategoryDropdown] = useState(false);
     const [showAllCategoriesDropdown, setShowAllCategoriesDropdown] = useState(false);
@@ -669,20 +670,43 @@ export default function BuyerMarketplace({ categories = [] }) {
         const unsubscribe = auth.onAuthStateChanged(async (u) => {
             setUser(u);
 
-            if (u) {
-                try {
-                    const docRef = doc(db, "businessProfiles", u.uid);
-                    const docSnap = await getDoc(docRef);
+            if (!u) {
+                setProfileId(null);
+                return;
+            }
 
-                    if (docSnap.exists()) {
-                        setProfileId(docSnap.id); // or u.uid
-                        console.log("Profile ID:", docSnap.id);
-                    } else {
-                        console.log("Business profile not found.");
+            try {
+                let profileId = u.uid;
+
+                // Check if the user is staff
+                const userDoc = await getDoc(doc(db, "users", u.uid));
+
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+
+                    if (
+                        userData.role === "staff" &&
+                        userData.businessId
+                    ) {
+                        // Staff should use their employer's business profile
+                        profileId = userData.businessId;
+                        setIsStaff(true)
                     }
-                } catch (error) {
-                    console.error(error);
                 }
+
+                // Verify that the business profile exists
+                const profileDoc = await getDoc(
+                    doc(db, "businessProfiles", profileId)
+                );
+
+                if (profileDoc.exists()) {
+                    setProfileId(profileId);
+                    console.log("Profile ID:", profileId);
+                } else {
+                    console.log("Business profile not found.");
+                }
+            } catch (error) {
+                console.error("Error loading profile:", error);
             }
         });
 
@@ -880,7 +904,7 @@ export default function BuyerMarketplace({ categories = [] }) {
                     {/* Right actions */}
                     <div className="flex items-center gap-1 shrink-0">
                         {user && (
-                            <Link to="/dashboard"
+                            <Link to={isStaff ? "/staff/dashboard" : "/dashboard"}
                                 className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-green-600 transition px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
                                 <MdGridView size={16} /> My Business
                             </Link>
@@ -1001,9 +1025,9 @@ export default function BuyerMarketplace({ categories = [] }) {
                                         transition-all
                                         duration-200
                                         ${activeCategory === cat.id
-                                            ? "bg-green-600 text-white shadow-md"
-                                            : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                                                                        }
+                                                ? "bg-green-600 text-white shadow-md"
+                                                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                            }
                                         `}
                                     >
                                         {cat.name}
