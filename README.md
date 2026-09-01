@@ -28,7 +28,7 @@ Built with **React**, **Firebase (Firestore, Auth)**, and **Tailwind CSS**.
 ## Getting Started (for developers)
 
 ```bash
-git clone https://github.com/<your-org>/me2sell-web.git
+git clone https://github.com/ENYO360/me2sell-web.git
 cd me2sell-web
 npm install
 npm run dev
