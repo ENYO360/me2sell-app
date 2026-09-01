@@ -39,8 +39,8 @@ const Signup = () => {
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
       await setDoc(doc(db, "users", userCred.user.uid), {
-        businessName,
         email,
+        role: "admin",
         createdAt: new Date(),
       });
 

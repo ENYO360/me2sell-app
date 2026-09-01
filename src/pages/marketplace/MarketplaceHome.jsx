@@ -701,7 +701,6 @@ export default function BuyerMarketplace({ categories = [] }) {
 
                 if (profileDoc.exists()) {
                     setProfileId(profileId);
-                    console.log("Profile ID:", profileId);
                 } else {
                     console.log("Business profile not found.");
                 }
