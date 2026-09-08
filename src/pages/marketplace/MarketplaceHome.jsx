@@ -1237,7 +1237,7 @@ export default function BuyerMarketplace({ categories = [] }) {
                                 )}
 
                                 {user && (
-                                    <Link to="/dashboard"
+                                    <Link to={isStaff ? "/staff/dashboard" : "dashboard"}
                                         onClick={() => setShowMobileDrawer(false)}
                                         className="flex items-center gap-2 w-full p-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                         <MdGridView size={16} /> My Seller Account

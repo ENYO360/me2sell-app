@@ -280,6 +280,11 @@ function ProductCard({ product, currency, isLowStock, ownerLoading, onAddToCart,
                 <div className="flex items-center justify-between text-sm
                                 text-gray-600 dark:text-gray-400 sm:mb-2">
                     <span>Stock: {product.quantity}</span>
+                    {product.discountPrice ? (
+                        <span className="text-xs text-green-500 font-semibold dark:text-gray-300">
+                            DP: {currency.symbol}{Number(product.discountPrice).toLocaleString()}
+                        </span>
+                    ) : null}
                     {product.sku && (
                         <span className="text-xs">SKU: {product.sku}</span>
                     )}
