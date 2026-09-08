@@ -53,10 +53,24 @@ function ProductCard({ p, currency, addToCart, startSale, lowStockThreshold, add
 
       <div className="p-3 space-y-2">
         <h5 className="font-bold text-sm text-gray-900 dark:text-gray-300 line-clamp-1">{p.name}</h5>
-        <div className="flex justify-between items-center text-xs text-gray-500">
-          <span>Stock: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"}`}>{p.quantity ?? 0}</span></span>
-          <span className="font-bold text-[#03165A] dark:text-[#163bbf]">{currency.symbol}{(p.sellingPrice ?? 0).toLocaleString()}</span>
-        </div>
+           <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400">
+                        Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"
+                          }`}>{p.quantity}</span>
+                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm font-black text-[#03165A] dark:text-gray-300">
+                          {currency.symbol}{p.sellingPrice.toLocaleString()}
+                        </span>
+                        {p.discountPrice ? (
+                        <p className="text-xs text-gray-400">
+                            DP: <span className="text-green-500 font-semibold dark:text-gray-300">
+                              {currency.symbol}{p.discountPrice.toLocaleString()}
+                            </span>
+                        </p>
+                        ) : ""}
+                      </div>
+                    </div>
         {p.department && <p className="text-[10px] text-gray-400">Dept: {p.department}</p>}
 
         {isOut ? (

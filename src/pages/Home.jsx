@@ -12,6 +12,21 @@ import Logo from "../images/me2sell-logo.png";
 import EnyotronicsLogo from "../images/enyotronics-logo.png";
 import SalebookIllustration from "../images/salesbook-illustration2.png";
 import BuyerImg from "../images/buy.png";
+import ProductImg from "../images/home/products.png";
+import ProductDesktop from "../images/home/products-desktop.png";
+import Sales from "../images/home/sales.png";
+import SalesDesktop from "../images/home/sales-desktop.png";
+import Staff from "../images/home/staff.png";
+import StaffDesktop from "../images/home/staff-desktop.png";
+import Growth from "../images/home/growth.png";
+import GrowthDesktop from "../images/home/growth-desktop.png";
+import Market from "../images/home/market.png";
+import Market2 from "../images/home/market2.png";
+import MarketDesktop from "../images/home/market-desktop.png";
+import ProductDetail from "../images/home/product-details.png";
+import ProductDetailDesktop from "../images/home/product-details-desktop.png"
+import Seller from "../images/home/seller.png";
+import SellerDesktop from "../images/home/seller-desktop.png";
 
 /* ── Floating orb background ─────────────────────────────────── */
 function Orbs({ seller }) {
@@ -53,7 +68,7 @@ function Counter({ to, suffix = "" }) {
 }
 
 /* ── Seller feature card */
-function FeatureCard({ icon: Icon, title, desc, gradient, delay }) {
+function FeatureCard({ icon: Icon, title, desc, gradient, delay, deskImage, image }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -64,17 +79,41 @@ function FeatureCard({ icon: Icon, title, desc, gradient, delay }) {
       className="flex flex-col justify-center items-center relative group bg-white rounded-3xl p-7 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden"
     >
       <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 bg-gradient-to-br ${gradient}`} />
+
       <div className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} mb-5 shadow-lg`}>
         <Icon className="text-white text-2xl" />
       </div>
+
       <h4 className="font-bold text-center text-gray-900 text-lg mb-2">{title}</h4>
-      <p className="text-gray-500 text-center text-sm leading-relaxed">{desc}</p>
+      <p className="text-gray-500 text-center text-sm leading-relaxed mb-5">{desc}</p>
+
+      {/* ── Step screenshot */}
+      {(deskImage || image) && (
+        <div className="w-full rounded-xl overflow-hidden border border-gray-100 shadow-sm">
+          {deskImage && (
+            <img
+              src={deskImage}
+              alt={`${title} — desktop view`}
+              className="hidden md:block w-full h-auto object-cover"
+              loading="lazy"
+            />
+          )}
+          {image && (
+            <img
+              src={image}
+              alt={`${title} — mobile view`}
+              className="block md:hidden w-full h-auto object-cover"
+              loading="lazy"
+            />
+          )}
+        </div>
+      )}
     </motion.div>
-  ); 
+  );
 }
 
 /* ── Buyer step card */
-function StepCard({ icon: Icon, step, title, desc, delay }) {
+function StepCard({ icon: Icon, step, title, desc, delay, image }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -92,6 +131,7 @@ function StepCard({ icon: Icon, step, title, desc, delay }) {
       </div>
       <h4 className="font-bold text-gray-900 text-lg mb-2">{title}</h4>
       <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+      <img src={image} alt="image description" />
     </motion.div>
   );
 }
@@ -254,9 +294,9 @@ function BuyerHome({ user }) {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-10 mt-8">
-            <StepCard icon={FaSearch} step="1" title="Browse Products" desc="Explore hundreds of real products from local businesses by category or search." delay={0} />
-            <StepCard icon={FaStore} step="2" title="View Seller Info" desc="See the seller's business details, location, contact info and all their listed products." delay={0.1} />
-            <StepCard icon={FaWhatsapp} step="3" title="Contact Instantly" desc="Reach sellers directly via call or WhatsApp. No delays, no middlemen." delay={0.2} />
+            <StepCard icon={FaSearch} step="1" title="Browse Products" desc="Explore hundreds of real products from local businesses by category or search." delay={0} image={Market2} />
+            <StepCard icon={FaStore} step="2" title="View Seller Info" desc="See the seller's business details, location, contact info and all their listed products." delay={0.1} image={ProductDetail} />
+            <StepCard icon={FaWhatsapp} step="3" title="Contact Instantly" desc="Reach sellers directly via call or WhatsApp. No delays, no middlemen." delay={0.2} image={Seller}/>
           </div>
         </div>
       </section>
@@ -304,10 +344,10 @@ function SellerHome({ user, dashboardPath }) {
   const heroY = useTransform(scrollY, [0, 400], [0, -60]);
 
   const features = [
-    { icon: FaStore, title: "Product Management", desc: "Add, categorize and track all your inventory in seconds.", gradient: "from-blue-500 to-indigo-600", delay: 0 },
-    { icon: FaCashRegister, title: "Quick Sales Recording", desc: "Fast and intuitive checkout. Record every sale with one tap.", gradient: "from-emerald-500 to-teal-600", delay: 0.1 },
-    { icon: FaUsers, title: "Staff Management", desc: "Assign roles, set permissions and track staff performance.", gradient: "from-violet-500 to-purple-600", delay: 0.2 },
-    { icon: FaChartLine, title: "Business Insights", desc: "Clear revenue and profit reports at a glance, every day.", gradient: "from-orange-500 to-rose-500", delay: 0.3 },
+    { icon: FaStore, image: ProductImg, deskImage: ProductDesktop, title: "Product Management", desc: "Add, categorize and track all your inventory in seconds.", gradient: "from-blue-500 to-indigo-600", delay: 0 },
+    { icon: FaCashRegister, image: Sales, deskImage: SalesDesktop, title: "Quick Sales Recording", desc: "Fast and intuitive checkout. Record every sale with one tap.", gradient: "from-emerald-500 to-teal-600", delay: 0.1 },
+    { icon: FaUsers, image: Staff, deskImage: StaffDesktop, title: "Staff Management", desc: "Assign roles, set permissions and track staff performance.", gradient: "from-violet-500 to-purple-600", delay: 0.2 },
+    { icon: FaChartLine, image: Growth, deskImage: GrowthDesktop, title: "Business Insights", desc: "Clear revenue and profit reports at a glance, every day.", gradient: "from-orange-500 to-rose-500", delay: 0.3 },
   ];
 
   return (
@@ -443,7 +483,7 @@ function SellerHome({ user, dashboardPath }) {
             <p className="mt-4 text-gray-500 max-w-xl mx-auto">Simple, powerful tools to help you manage and grow your business every day.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid  gap-6">
             {features.map(f => <FeatureCard key={f.title} {...f} />)}
           </div>
         </div>
@@ -456,12 +496,13 @@ function SellerHome({ user, dashboardPath }) {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-[2rem] p-10 md:p-14 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8"
+            className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-[2rem] p-10 md:p-14 overflow-hidden flex flex-col  items-center justify-between gap-8"
           >
+            <div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl" />
 
-            <div className="relative text-center md:text-left">
+            <div className="relative text-center">
               <span className="inline-block text-xs font-bold tracking-widest uppercase text-green-400 mb-3">
                 Also Available
               </span>
@@ -483,6 +524,11 @@ function SellerHome({ user, dashboardPath }) {
                 className="inline-flex items-center justify-center gap-2 border border-gray-600 text-gray-300 px-7 py-4 rounded-2xl font-bold hover:border-gray-400 hover:text-white transition-all duration-200">
                 <MdSpaceDashboard size={16} /> My Dashboard
               </Link>
+            </div>
+            </div>
+            <div>
+              <img className="block md:hidden rounded-[2rem]" src={Market} alt="marketplace view" />
+              <img className="hidden md:block rounded-lg" src={MarketDesktop} alt="marketplace view" />
             </div>
           </motion.div>
         </div>

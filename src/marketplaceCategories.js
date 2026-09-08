@@ -1,64 +1,182 @@
-export const MARKETPLACE_CATEGORIES =  [
+export const MARKETPLACE_CATEGORIES = [
   { id: "all", name: "All Products" },
 
-  // Electronics & Gadgets
+  // ── Electronics & Gadgets ──
   { id: "electronics", name: "Electronics" },
-  { id: "phones", name: "Mobile Phones & Accessories" },
-  { id: "computers", name: "Computers & Office" },
+  { id: "phones", name: "Mobile Phones" },
+  { id: "phone-accessories", name: "Phone Accessories" },
+  { id: "tablets", name: "Tablets" },
+  { id: "computers", name: "Computers & Laptops" },
+  { id: "computer-accessories", name: "Computer Accessories" },
+  { id: "printers-scanners", name: "Printers & Scanners" },
+  { id: "networking", name: "Networking (Routers & Modems)" },
+  { id: "monitors", name: "Monitors & Projectors" },
   { id: "audio", name: "Audio & Headphones" },
-  { id: "cameras", name: "Cameras & Drones" },
-  { id: "gaming", name: "Gaming & Consoles" },
-  { id: "smart-devices", name: "Smart Devices & Wearables" },
+  { id: "speakers", name: "Speakers & Sound Systems" },
+  { id: "cameras", name: "Cameras & Photography" },
+  { id: "drones", name: "Drones & Accessories" },
+  { id: "gaming", name: "Gaming Consoles" },
+  { id: "gaming-accessories", name: "Gaming Accessories" },
+  { id: "smart-devices", name: "Smart Home Devices" },
+  { id: "wearables", name: "Wearables & Smartwatches" },
   { id: "powerbanks", name: "Power Banks & Chargers" },
-  { id: "wireless-mp3-players", name: "Wireless MP3 Players" },
+  { id: "batteries", name: "Batteries" },
+  { id: "wireless-mp3-players", name: "MP3 Players & Portable Media" },
+  { id: "tv-video", name: "TVs & Home Theatre" },
+  { id: "calculators", name: "Calculators" },
+  { id: "walkie-talkies", name: "Walkie-Talkies & Two-Way Radios" },
 
-  // Fashion
+  // ── Fashion ──
   { id: "fashion", name: "Fashion" },
-  { id: "mens-fashion", name: "Men’s Fashion" },
-  { id: "womens-fashion", name: "Women’s Fashion" },
+  { id: "mens-fashion", name: "Men's Clothing" },
+  { id: "womens-fashion", name: "Women's Clothing" },
   { id: "kids-fashion", name: "Kids & Baby Clothing" },
+  { id: "traditional-wear", name: "Traditional & Cultural Wear" },
+  { id: "underwear-lingerie", name: "Underwear & Lingerie" },
+  { id: "sleepwear", name: "Sleepwear & Loungewear" },
+  { id: "sportswear", name: "Sportswear & Activewear" },
+  { id: "swimwear", name: "Swimwear" },
   { id: "shoes", name: "Shoes" },
+  { id: "mens-shoes", name: "Men's Shoes" },
+  { id: "womens-shoes", name: "Women's Shoes" },
+  { id: "kids-shoes", name: "Kids' Shoes" },
   { id: "bags", name: "Bags & Luggage" },
-  { id: "jewelry", name: "Jewelry & Watches" },
+  { id: "handbags", name: "Handbags & Purses" },
+  { id: "backpacks", name: "Backpacks" },
+  { id: "wallets", name: "Wallets" },
+  { id: "jewelry", name: "Jewelry" },
+  { id: "watches", name: "Watches" },
+  { id: "sunglasses-eyewear", name: "Sunglasses & Eyewear" },
+  { id: "belts", name: "Belts" },
+  { id: "hats-caps", name: "Hats & Caps" },
+  { id: "scarves-gloves", name: "Scarves & Gloves" },
+  { id: "fabrics-textiles", name: "Fabrics & Textiles" },
 
-  // Beauty & Health
+  // ── Beauty & Health ──
   { id: "beauty", name: "Beauty & Personal Care" },
-  { id: "hair", name: "Hair & Wigs" },
+  { id: "skincare", name: "Skincare" },
+  { id: "makeup", name: "Makeup & Cosmetics" },
+  { id: "hair", name: "Hair Care & Wigs" },
+  { id: "fragrances", name: "Fragrances & Perfumes" },
+  { id: "bath-body", name: "Bath & Body" },
+  { id: "nail-care", name: "Nail Care" },
+  { id: "mens-grooming", name: "Men's Grooming" },
+  { id: "salon-equipment", name: "Salon & Spa Equipment" },
   { id: "health", name: "Health Care & Medical Supplies" },
+  { id: "vitamins-supplements", name: "Vitamins & Supplements" },
+  { id: "personal-hygiene", name: "Personal Hygiene" },
+  { id: "sexual-wellness", name: "Sexual Wellness" },
+  { id: "medical-devices", name: "Medical Devices" },
 
-  // Home & Living
+  // ── Home & Living ──
   { id: "home", name: "Home & Kitchen" },
+  { id: "kitchenware", name: "Kitchenware & Cookware" },
+  { id: "tableware", name: "Tableware & Dinnerware" },
   { id: "furniture", name: "Furniture" },
+  { id: "living-room-furniture", name: "Living Room Furniture" },
+  { id: "bedroom-furniture", name: "Bedroom Furniture" },
+  { id: "office-furniture", name: "Office Furniture" },
+  { id: "outdoor-furniture", name: "Outdoor Furniture" },
+  { id: "bedding", name: "Bedding & Linen" },
   { id: "lighting", name: "Lighting & Fixtures" },
   { id: "home-decor", name: "Home Decor" },
+  { id: "rugs-carpets", name: "Rugs & Carpets" },
+  { id: "curtains-blinds", name: "Curtains & Blinds" },
+  { id: "wall-art", name: "Wall Art & Frames" },
   { id: "appliances", name: "Home Appliances" },
+  { id: "kitchen-appliances", name: "Kitchen Appliances" },
+  { id: "laundry-appliances", name: "Laundry Appliances" },
+  { id: "cooling-heating", name: "Cooling & Heating (AC, Fans, Heaters)" },
   { id: "storage", name: "Storage & Organization" },
+  { id: "cleaning-supplies", name: "Cleaning Supplies & Equipment" },
+  { id: "generators-solar", name: "Generators & Solar Power" },
 
-  // Outdoor & Lifestyle
+  // ── Outdoor, Sports & Lifestyle ──
   { id: "sports", name: "Sports & Outdoors" },
   { id: "camping", name: "Camping & Hiking" },
   { id: "fitness", name: "Fitness Equipment" },
-  { id: "cycling", name: "Cycling Accessories" },
+  { id: "cycling", name: "Bicycles & Cycling Accessories" },
+  { id: "team-sports", name: "Team Sports Equipment" },
+  { id: "fishing", name: "Fishing Gear" },
+  { id: "hunting", name: "Hunting Gear" },
+  { id: "swimming-water-sports", name: "Swimming & Water Sports" },
+  { id: "travel-gear", name: "Travel Accessories" },
 
-  // Automotive
+  // ── Automotive ──
   { id: "automotive", name: "Automobiles & Motorcycles" },
+  { id: "car-parts", name: "Car Parts & Spares" },
   { id: "car-accessories", name: "Car Accessories" },
-  { id: "car-electronics", name: "Car Electronics" },
+  { id: "car-electronics", name: "Car Electronics & Audio" },
+  { id: "motorcycle-parts", name: "Motorcycle Parts & Accessories" },
+  { id: "tires-wheels", name: "Tires & Wheels" },
+  { id: "car-care", name: "Car Care & Detailing" },
+  { id: "tools-garage", name: "Garage Tools & Equipment" },
 
-  // Tools & Industry
+  // ── Tools & Industry ──
   { id: "tools", name: "Tools & Home Improvement" },
-  { id: "industrial", name: "Industrial Equipment" },
+  { id: "hand-tools", name: "Hand Tools" },
+  { id: "power-tools", name: "Power Tools" },
+  { id: "building-materials", name: "Building & Construction Materials" },
+  { id: "plumbing", name: "Plumbing Supplies" },
+  { id: "electrical-supplies", name: "Electrical Supplies" },
+  { id: "paint-supplies", name: "Paint & Painting Supplies" },
+  { id: "industrial", name: "Industrial Equipment & Machinery" },
+  { id: "safety-workwear", name: "Safety Equipment & Workwear" },
   { id: "security", name: "Security & Surveillance" },
+  { id: "locks", name: "Locks & Padlocks" },
+  { id: "packaging-supplies", name: "Packaging & Shipping Supplies" },
+  { id: "agriculture", name: "Agriculture & Farming Equipment" },
 
-  // Kids & Fun
+  // ── Kids & Fun ──
   { id: "toys", name: "Toys & Hobbies" },
+  { id: "action-figures", name: "Action Figures & Collectibles" },
+  { id: "dolls-playsets", name: "Dolls & Playsets" },
+  { id: "outdoor-toys", name: "Outdoor & Ride-On Toys" },
+  { id: "puzzles-games", name: "Puzzles & Board Games" },
   { id: "education", name: "Educational Toys" },
+  { id: "baby-products", name: "Baby Gear & Products" },
+  { id: "diapering", name: "Diapering & Potty Training" },
+  { id: "feeding", name: "Baby Feeding" },
+  { id: "strollers-car-seats", name: "Strollers & Car Seats" },
 
-  // Office & Stationery
+  // ── Office & Stationery ──
   { id: "office", name: "Office & School Supplies" },
   { id: "stationery", name: "Stationery & Writing Materials" },
+  { id: "notebooks-paper", name: "Notebooks & Paper" },
+  { id: "art-craft-supplies", name: "Art & Craft Supplies" },
+  { id: "printing-supplies", name: "Printing & Ink Supplies" },
+  { id: "bags-school", name: "School Bags" },
 
-  // Digital & Accessories
-  { id: "accessories", name: "Accessories" },
-  { id: "phone-accessories", name: "Phone Accessories" },
+  // ── Groceries & Food ──
+  { id: "groceries", name: "Groceries & Foodstuff" },
+  { id: "beverages", name: "Beverages & Drinks" },
+  { id: "snacks", name: "Snacks & Confectionery" },
+  { id: "cooking-essentials", name: "Cooking Essentials & Spices" },
+  { id: "frozen-foods", name: "Frozen & Chilled Foods" },
+  { id: "organic-foods", name: "Organic & Health Foods" },
+
+  // ── Pets ──
+  { id: "pet-supplies", name: "Pet Supplies" },
+  { id: "pet-food", name: "Pet Food" },
+  { id: "pet-accessories", name: "Pet Accessories & Grooming" },
+
+  // ── Books, Media & Music ──
+  { id: "books", name: "Books" },
+  { id: "textbooks", name: "Textbooks & Educational Materials" },
+  { id: "movies-music", name: "Movies & Music" },
+  { id: "musical-instruments", name: "Musical Instruments" },
+
+  // ── Events, Weddings & Gifts ──
+  { id: "weddings-events", name: "Weddings & Event Supplies" },
+  { id: "party-supplies", name: "Party Supplies & Decorations" },
+  { id: "gifts", name: "Gifts & Gift Cards" },
+  { id: "flowers", name: "Flowers & Plants" },
+
+  // ── Religious & Cultural ──
+  { id: "religious-items", name: "Religious & Spiritual Items" },
+
+  // ── Misc ──
+  { id: "accessories", name: "General Accessories" },
+  { id: "second-hand", name: "Second-Hand / Used Items" },
+  { id: "others", name: "Others / Miscellaneous" },
 ];

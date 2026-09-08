@@ -644,9 +644,23 @@ function ProductCard({ product, currency, addToCart, startSale, lowStockThreshol
       </div>
       <div className="p-3 space-y-2">
         <h3 className="font-bold text-sm text-gray-900 dark:text-gray-300 line-clamp-1">{product.name}</h3>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-400">Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"}`}>{product.quantity}</span></span>
-          <span className="font-black text-[#03165A] dark:text-gray-300">{currency.symbol}{product.sellingPrice.toLocaleString()}</span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-400">
+            Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"
+              }`}>{product.quantity}</span>
+          </span>
+          <div className="flex flex-col items-end">
+            <span className="text-sm font-black text-[#03165A] dark:text-gray-300">
+              {currency.symbol}{product.sellingPrice.toLocaleString()}
+            </span>
+            {product.discountPrice ? (
+              <p className="text-xs text-gray-400">
+                DP: <span className="text-green-500 font-semibold dark:text-gray-300">
+                  {currency.symbol}{product.discountPrice.toLocaleString()}
+                </span>
+              </p>
+            ) : ""}
+          </div>
         </div>
         {isOut ? (
           <div className="w-full text-center bg-red-50 text-red-500 border border-red-200 py-2 rounded-xl text-xs font-bold">Out of Stock</div>

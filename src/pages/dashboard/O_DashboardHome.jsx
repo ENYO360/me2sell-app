@@ -160,9 +160,18 @@ export default function DashboardHome() {
                         Qty: <span className={`font-semibold ${isOut ? "text-red-500" : isLowStock ? "text-amber-600" : "text-gray-700"
                           }`}>{product.quantity}</span>
                       </span>
-                      <span className="text-sm font-black text-[#03165A] dark:text-gray-300">
-                        {currency.symbol}{product.sellingPrice.toLocaleString()}
-                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm font-black text-[#03165A] dark:text-gray-300">
+                          {currency.symbol}{product.sellingPrice.toLocaleString()}
+                        </span>
+                        {product.discountPrice ? (
+                        <p className="text-xs text-gray-400">
+                            DP: <span className="text-green-500 font-semibold dark:text-gray-300">
+                              {currency.symbol}{product.discountPrice.toLocaleString()}
+                            </span>
+                        </p>
+                        ) : ""}
+                      </div>
                     </div>
 
                     {/* Action buttons */}

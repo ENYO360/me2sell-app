@@ -49,6 +49,7 @@ export default function Products() {
     name: "",
     costPrice: "",
     sellingPrice: "",
+    discountPrice: "",
     quantity: "",
     category: "",
     department: "",
@@ -129,6 +130,7 @@ export default function Products() {
       name: product.name,
       costPrice: product.costPrice,
       sellingPrice: product.sellingPrice,
+      discountPrice: product.discountPrice ? String(product.discountPrice) : "",
       quantity: product.quantity,
       category: product.categoryId || "",
       department: product.departmentId || "",
@@ -182,6 +184,7 @@ export default function Products() {
       form.name === initialForm.name &&
       String(form.costPrice) === String(initialForm.costPrice) &&
       String(form.sellingPrice) === String(initialForm.sellingPrice) &&
+      form.discountPrice === initialForm.discountPrice &&
       String(form.quantity) === String(initialForm.quantity) &&
       form.category === initialForm.category &&
       form.department === initialForm.department &&
@@ -230,6 +233,8 @@ export default function Products() {
         name: form.name,
         costPrice: Number(form.costPrice),
         sellingPrice: Number(form.sellingPrice),
+        // 0 means "no discount" — cleared explicitly so old discounts don't linger
+        discountPrice: form.discountPrice ? Number(form.discountPrice) : 0,
         quantity: Number(form.quantity),
         category: selectedCategory?.name || "",
         categoryId: selectedCategory?.id || "",
@@ -328,6 +333,16 @@ export default function Products() {
       newErrors.sellingPrice = "Selling price is required";
     }
 
+    // Discount price is optional, but if provided it must be a valid amount
+    // lower than the selling price.
+    if (form.discountPrice) {
+      if (isNaN(form.discountPrice) || Number(form.discountPrice) <= 0) {
+        newErrors.discountPrice = "Enter a valid discount price";
+      } else if (form.sellingPrice && Number(form.discountPrice) >= Number(form.sellingPrice)) {
+        newErrors.discountPrice = "Discount price must be lower than the selling price";
+      }
+    }
+
     setErrors(newErrors);
 
     // valid only if no errors
@@ -380,8 +395,8 @@ export default function Products() {
               key={key}
               onClick={() => setStockFilter(key)}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm ${stockFilter === key
-                  ? `${activeClass} shadow-lg`
-                  : "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-500 text-gray-500 dark:text-gray-400 hover:border-blue-500/30 dark:hover:border-blue-500/30 hover:text-blue-500 dark:hover:text-blue-500"
+                ? `${activeClass} shadow-lg`
+                : "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-500 text-gray-500 dark:text-gray-400 hover:border-blue-500/30 dark:hover:border-blue-500/30 hover:text-blue-500 dark:hover:text-blue-500"
                 }`}
             >
               {label}
@@ -425,6 +440,12 @@ export default function Products() {
                 ? Math.round((profit / Number(p.costPrice)) * 100)
                 : 0;
 
+              // A discount only counts if it's a positive number lower than the selling price
+              const hasDiscount = Number(products.discountPrice) > 0 && Number(products.discountPrice) < Number(products.sellingPrice);
+              const discountPct = hasDiscount
+                ? Math.round((1 - Number(products.discountPrice) / Number(products.sellingPrice)) * 100)
+                : 0;
+
               return (
                 <motion.div
                   key={p.id}
@@ -439,8 +460,8 @@ export default function Products() {
                 >
                   {/* Top accent */}
                   <div className={`h-1 w-full ${isOut ? "bg-red-400"
-                      : isLowStock ? "bg-amber-400"
-                        : "bg-gradient-to-r from-blue-500 to-green-500"
+                    : isLowStock ? "bg-amber-400"
+                      : "bg-gradient-to-r from-blue-500 to-green-500"
                     }`} />
 
                   <div className="p-4 space-y-3">
@@ -514,6 +535,14 @@ export default function Products() {
                           {currency.symbol}{Number(p.sellingPrice).toLocaleString()}
                         </span>
                       </div>
+                      {p.discountPrice &&
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-gray-400 font-medium">Discount Price</span>
+                          <span className="font-bold text-blue-300">
+                            {currency.symbol}{Number(p.discountPrice).toLocaleString()}
+                          </span>
+                        </div>
+                      }
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-gray-400 font-medium">Profit</span>
                         <span className={`font-bold ${profit >= 0 ? "text-green-600" : "text-red-500"}`}>
@@ -673,6 +702,27 @@ export default function Products() {
                       </div>
                       {errors.sellingPrice && <p className="text-red-500 text-xs">{errors.sellingPrice}</p>}
                     </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold uppercase tracking-widest text-gray-400">Discount Price</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-300 pointer-events-none">
+                          {currency.symbol}
+                        </span>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={form.discountPrice}
+                          onChange={(e) => { setForm({ ...form, discountPrice: e.target.value }); setErrors({ ...errors, discountPrice: null }); }}
+                          className={`w-full pl-7 pr-3 py-2.5 text-sm dark:text-gray-300 font-bold border rounded-xl outline-none transition
+                            ${errors.discountPrice
+                              ? "border-red-400 bg-red-50"
+                              : "border-gray-200 dark:border-gray-500 bg-gray-50 dark:bg-gray-600 focus:bg-white focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/10"
+                            }`}
+                        />
+                      </div>
+                      {errors.discountPrice && <p className="text-red-500 text-xs">{errors.discountPrice}</p>}
+                    </div>
                   </div>
 
                   {/* Live profit preview */}
@@ -690,6 +740,22 @@ export default function Products() {
                       </p>
                     </div>
                   )}
+
+                  {/* Live discount preview */}
+                  {form.sellingPrice && form.discountPrice && !errors.discountPrice && Number(form.discountPrice) < Number(form.sellingPrice) ?  (
+                    <div className="flex items-center justify-between px-4 py-2.5 bg-blue-500/[0.04] rounded-xl border border-blue-500/10">
+                      <p className="text-xs text-gray-500 font-medium">Customer Saves</p>
+                      <p className={`text-sm font-bold ${Number(form.discountPrice) < Number(form.sellingPrice) ? "text-green-600" : "text-red-500"
+                        }`}>
+                        {currency.symbol}{(Number(form.sellingPrice) - Number(form.discountPrice)).toLocaleString()}
+                        {Number(form.sellingPrice) > 0 && (
+                          <span className="ml-1 text-xs opacity-70">
+                            ({Math.round(((Number(form.sellingPrice) - Number(form.discountPrice)) / Number(form.sellingPrice)) * 100)}%)
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  ) : null}
 
                   {/* Quantity */}
                   <div className="space-y-1.5">

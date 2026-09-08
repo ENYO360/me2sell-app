@@ -87,6 +87,8 @@ export const ProductProvider = ({ children }) => {
             name: data.name || "",
             sellingPrice: Number(data.sellingPrice) || 0,
             costPrice: Number(data.costPrice) || 0,
+            // Optional discounted selling price. 0 / undefined means "no discount".
+            discountPrice: Number(data.discountPrice) || 0,
             quantity: Number(data.quantity) || 0,
             categoryId: data.categoryId || "",
             departmentId: data.departmentId || "",
