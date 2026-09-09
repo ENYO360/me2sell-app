@@ -24,10 +24,11 @@ import {
   setDoc,
   query,
   where,
+  orderBy,
 } from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoMdSettings } from "react-icons/io";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaHistory } from "react-icons/fa";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { stampProductVersion } from "../../utils/stampProductVersion";
 
@@ -44,6 +45,11 @@ export default function Products() {
   const [stockFilter, setStockFilter] = useState("all"); // all | low | out
   const [showSettings, setShowSettings] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyProduct, setHistoryProduct] = useState(null);
+  const [stockHistory, setStockHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -100,6 +106,17 @@ export default function Products() {
       document.body.style.overflow = "auto";
     };
   }, [modalOpen]);
+
+  const logStockChange = async (productId, previousQuantity, newQuantity, type) => {
+    const historyRef = collection(db, "products", user.uid, "productList", productId, "stockHistory");
+    await addDoc(historyRef, {
+      previousQuantity,
+      newQuantity,
+      change: newQuantity - previousQuantity,
+      type,
+      changedAt: serverTimestamp(),
+    });
+  };
 
   // ================
   // OPEN ADD PRODUCT MODAL
@@ -250,6 +267,20 @@ export default function Products() {
       { merge: true }
     );
 
+    // Log stock change if quantity changed
+    const newQty = Number(form.quantity);
+
+    if (!editingProduct) {
+      // first stock entry ever, on creation
+      await logStockChange(productId, 0, newQty, "initial");
+    } else {
+      const prevQty = Number(initialForm.quantity);
+      if (prevQty !== newQty) {
+        // only log when quantity actually changed
+        await logStockChange(productId, prevQty, newQty, "edit");
+      }
+    }
+
     await stampProductVersion(user.uid);
 
     setSaving(false);
@@ -261,6 +292,26 @@ export default function Products() {
     setModalOpen(false);
   };
 
+  // ================
+  // OPEN STOCK HISTORY MODAL
+  // ================
+  const openStockHistory = async (product) => {
+    setHistoryProduct(product);
+    setHistoryModalOpen(true);
+    setLoadingHistory(true);
+
+    try {
+      const historyRef = collection(db, "products", user.uid, "productList", product.id, "stockHistory");
+      const q = query(historyRef, orderBy("changedAt", "desc"));
+      const snap = await getDocs(q);
+      setStockHistory(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error("Failed to load stock history:", err);
+      notify("Failed to load stock history", "error");
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
 
   // ================
   // DELETE PRODUCT
@@ -509,6 +560,12 @@ export default function Products() {
                             >
                               <FaEdit className="text-blue-500 text-xs" /> Edit
                             </button>
+                            <button
+                              onClick={() => { openStockHistory(p); setOpenMenuId(null); }}
+                              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+                            >
+                              <FaHistory className="text-green-600 text-xs" /> Stock History
+                            </button>
                             <div className="h-px bg-gray-100 mx-2" />
                             <button
                               onClick={() => { deleteProduct(p.id); setOpenMenuId(null); }}
@@ -535,14 +592,14 @@ export default function Products() {
                           {currency.symbol}{Number(p.sellingPrice).toLocaleString()}
                         </span>
                       </div>
-                      {p.discountPrice &&
+                      {p.discountPrice ? (
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-gray-400 font-medium">Discount Price</span>
                           <span className="font-bold text-blue-300">
                             {currency.symbol}{Number(p.discountPrice).toLocaleString()}
                           </span>
                         </div>
-                      }
+                      ) : null}
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-gray-400 font-medium">Profit</span>
                         <span className={`font-bold ${profit >= 0 ? "text-green-600" : "text-red-500"}`}>
@@ -742,7 +799,7 @@ export default function Products() {
                   )}
 
                   {/* Live discount preview */}
-                  {form.sellingPrice && form.discountPrice && !errors.discountPrice && Number(form.discountPrice) < Number(form.sellingPrice) ?  (
+                  {form.sellingPrice && form.discountPrice && !errors.discountPrice && Number(form.discountPrice) < Number(form.sellingPrice) ? (
                     <div className="flex items-center justify-between px-4 py-2.5 bg-blue-500/[0.04] rounded-xl border border-blue-500/10">
                       <p className="text-xs text-gray-500 font-medium">Customer Saves</p>
                       <p className={`text-sm font-bold ${Number(form.discountPrice) < Number(form.sellingPrice) ? "text-green-600" : "text-red-500"
@@ -895,6 +952,74 @@ export default function Products() {
                   </button>
                 </div>
 
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {historyModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setHistoryModalOpen(false)}
+              className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+              style={{ background: "rgba(3,22,90,0.45)", backdropFilter: "blur(8px)" }}
+            >
+              <motion.div
+                initial={{ scale: 0.94, opacity: 0, y: 24 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.94, opacity: 0, y: 24 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative w-full sm:max-w-md bg-white dark:bg-gray-700 sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl max-h-[80vh] flex flex-col"
+              >
+                <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-[#0d6b4e] to-green-500 flex-shrink-0" />
+
+                <div className="px-7 pt-5 pb-4 flex items-center justify-between flex-shrink-0">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-green-600 mb-0.5">History</p>
+                    <h2 className="text-xl font-bold text-blue-500">{historyProduct?.name}</h2>
+                  </div>
+                  <button
+                    onClick={() => setHistoryModalOpen(false)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 text-gray-400 transition"
+                  >
+                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                      <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="overflow-y-auto flex-1 px-7 pb-6 space-y-3">
+                  {loadingHistory ? (
+                    <p className="text-sm text-gray-400 text-center py-8">Loading…</p>
+                  ) : stockHistory.length === 0 ? (
+                    <p className="text-sm text-gray-400 text-center py-8">No stock changes recorded yet.</p>
+                  ) : (
+                    stockHistory.map((h) => (
+                      <div
+                        key={h.id}
+                        className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-gray-500 bg-gray-50 dark:bg-gray-600"
+                      >
+                        <div>
+                          <p className="text-xs text-gray-400">
+                            {h.changedAt?.toDate ? h.changedAt.toDate().toLocaleString() : "Just now"}
+                          </p>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                            {h.type === "initial" ? "Initial stock" : "Edited"}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-400">{h.previousQuantity} → {h.newQuantity}</p>
+                          <p className={`text-sm font-bold ${h.change >= 0 ? "text-green-600" : "text-red-500"}`}>
+                            {h.change >= 0 ? "+" : ""}{h.change}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </motion.div>
             </motion.div>
           )}
