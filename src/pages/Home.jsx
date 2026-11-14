@@ -785,6 +785,7 @@ export default function Landing() {
             <Link to="/how-it-works" className="text-gray-500 hover:text-blue-600 transition font-medium">How It Works</Link>
             <Link to="/marketplace" className="text-gray-500 hover:text-green-600 transition font-medium">Marketplace</Link>
           </div>
+          <Link to="/privacy" className="text-gray-400 hover:text-blue-600 transition font-medium">Privacy Policy</Link>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400">Powered by</span>
             <Link to="/enyotronics">

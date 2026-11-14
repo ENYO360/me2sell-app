@@ -25,6 +25,7 @@ import StaffCart from './pages/staff/StaffCart';
 import StaffSalesHistory from './pages/staff/StaffSalesHistory';
 import HowItWorks from './pages/HowItWorks';
 import Support from './pages/Support';
+import PrivacyPolicy from './pages/Privacy';
 import EnyotronicsPage from './pages/EnyotronicsPage';
 import ProfileSetup from './pages/SetupProfile';
 import ForgotPassword from './pages/ForgotPassword';
@@ -120,6 +121,7 @@ function App() {
             } />
           <Route path="/staff/login" element={<StaffLogin />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/enyotronics" element={<EnyotronicsPage />} />
           <Route path="/setup-profile" element={<ProfileSetup />} />
           <Route path="/marketplace" element={<BuyerMarketplace />} />
