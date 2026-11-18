@@ -20,13 +20,15 @@ import {
   doc,
   getDoc,
   updateDoc,
+  deleteDoc,
+  writeBatch,
   collection,
   query,
   where,
   getDocs,
 } from "firebase/firestore";
-import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
-import { FaEdit, FaUser, FaBuilding, FaPhone, FaMapMarkedAlt, FaGlobe, FaSave, FaKey, FaShoppingCart, FaMoneyBillWave } from "react-icons/fa";
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider, deleteUser, } from "firebase/auth";
+import { FaEdit, FaUser, FaBuilding, FaPhone, FaMapMarkedAlt, FaGlobe, FaSave, FaKey, FaShoppingCart, FaMoneyBillWave, FaTrash, } from "react-icons/fa";
 import { MdEmail, MdSave, MdEdit } from "react-icons/md";
 
 export default function Profile() {
@@ -64,6 +66,14 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  const isDeleteInvalid = !deletePassword || deleteConfirmText !== "DELETE" || deleting;
+
   const navigate = useNavigate();
   const { addToCart, adding } = useCart();
   const { startSale } = useDirectSale();
@@ -258,6 +268,78 @@ export default function Profile() {
       setChangingPassword(false);
     }
   };
+
+  // Deletes every doc in `colName` owned by this user (batches of 500 max)
+  const deleteCollection = async (...path) => {
+  const snap = await getDocs(collection(db, ...path));
+  let batch = writeBatch(db);
+  let n = 0;
+  for (const d of snap.docs) {
+    batch.delete(d.ref);
+    if (++n === 400) { await batch.commit(); batch = writeBatch(db); n = 0; }
+  }
+  if (n > 0) await batch.commit();
+};
+
+const deleteAccount = async () => {
+  if (!user || isDeleteInvalid) return;
+  const uid = user.uid;
+
+  try {
+    setDeleting(true);
+
+    // 1. Re-authenticate first
+    const credential = EmailAuthProvider.credential(user.email, deletePassword);
+    await reauthenticateWithCredential(user, credential);
+
+    // 2. Stock history lives under each product, so go product by product
+    const productsSnap = await getDocs(collection(db, "products", uid, "productList"));
+    for (const p of productsSnap.docs) {
+      await deleteCollection("products", uid, "productList", p.id, "stockHistory");
+    }
+    await deleteCollection("products", uid, "productList");
+    await deleteCollection("sales", uid, "userSales");
+    await deleteCollection("categories", uid, "userCategories");
+    await deleteCollection("departments", uid, "userDepartments");
+    await deleteCollection("dashboardStats", uid, "stats"); // use your actual subcollection names
+    await deleteCollection("users", uid, "cart");
+    await deleteCollection("users", uid, "notifications");
+
+    // 3. Staff: delete their dependent docs BEFORE the staff doc, because
+    //    your rules call get(staff/{id}) to authorize those deletes
+    const staffSnap = await getDocs(query(collection(db, "staff"), where("businessId", "==", uid)));
+    for (const s of staffSnap.docs) {
+      await deleteDoc(doc(db, "staffDashboardStats", s.id)); // plus its subcollections if any
+      await deleteDoc(doc(db, "users", s.id));
+      await deleteDoc(s.ref);
+    }
+    const actSnap = await getDocs(query(collection(db, "staffActivity"), where("businessId", "==", uid)));
+    for (const a of actSnap.docs) await deleteDoc(a.ref);
+
+    // 4. Top-level docs, then the Auth user last
+    await deleteDoc(doc(db, "productVersions", uid));
+    await deleteDoc(doc(db, "users", uid));
+    await deleteDoc(doc(db, "businessProfiles", uid));
+    await deleteUser(user);
+
+    setShowDeleteModal(false);
+    navigate("/");
+  } catch (error) {
+    switch (error.code) {
+      case "auth/wrong-password":
+      case "auth/invalid-credential":
+        openConfirm("Incorrect password."); break;
+      case "auth/too-many-requests":
+        openConfirm("Too many attempts. Please try again later."); break;
+      case "auth/requires-recent-login":
+        openConfirm("Please log in again, then retry."); break;
+      default:
+        openConfirm(error.message);
+    }
+  } finally {
+    setDeleting(false);
+  }
+};
 
   const InputGroup = ({ label, children }) => (
     <label className="flex flex-col gap-1 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -495,12 +577,16 @@ export default function Profile() {
 
         {/* Change Password */}
         <div className="flex gap-2 flex-wrap items-center justify-between">
-          <button
-            onClick={() => setShowPasswordModal(true)}
-            className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg"
-          >
-            <FaKey /> Change Password
-          </button>
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={() => setShowPasswordModal(true)}
+              className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg">
+              <FaKey /> Change Password
+            </button>
+            <button onClick={() => setShowDeleteModal(true)}
+              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg">
+              <FaTrash /> Delete Account
+            </button>
+          </div>
           <Link to="/support" className="text-blue-500 font-semibold">Contact Us</Link>
         </div>
         {/* Password Modal */}
@@ -549,6 +635,54 @@ export default function Profile() {
                     }`}
                 >
                   Update
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {showDeleteModal && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex justify-center items-center p-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg">
+              <h3 className="text-lg font-bold mb-2 text-red-600">Delete Account</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                This permanently deletes your account, business profile, products and sales
+                history. This cannot be undone.
+              </p>
+
+              <input
+                type="password"
+                placeholder="Enter your password"
+                className="w-full p-2 mb-3 rounded bg-gray-200 dark:bg-gray-700"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder='Type "DELETE" to confirm'
+                className="w-full p-2 mb-4 rounded bg-gray-200 dark:bg-gray-700"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+              />
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDeletePassword("");
+                    setDeleteConfirmText("");
+                  }}
+                  className="px-4 py-2 bg-gray-500 text-white rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  disabled={isDeleteInvalid}
+                  onClick={deleteAccount}
+                  className={`px-4 py-2 text-white rounded ${isDeleteInvalid ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                    }`}
+                >
+                  {deleting ? "Deleting..." : "Delete Forever"}
                 </button>
               </div>
             </div>
